@@ -1,7 +1,10 @@
 package GoSNMPServer
 
-import "os"
-import "github.com/sirupsen/logrus"
+import (
+	"os"
+
+	"github.com/sirupsen/logrus"
+)
 
 // ILogger is a logger
 type ILogger interface {
@@ -28,12 +31,12 @@ type ILogger interface {
 	Warnln(args ...interface{})
 }
 
-//DefaultLogger is a logger warps logrus
+// DefaultLogger is a logger warps logrus
 type DefaultLogger struct {
 	*logrus.Logger
 }
 
-//NewDefaultLogger makes a new DefaultLogger
+// NewDefaultLogger makes a new DefaultLogger
 func NewDefaultLogger() ILogger {
 	var log = logrus.New()
 	log.Out = os.Stdout
@@ -41,78 +44,78 @@ func NewDefaultLogger() ILogger {
 	return WrapLogrus(log)
 }
 
-//WrapLogrus wraps a new DefaultLogger
+// WrapLogrus wraps a new DefaultLogger
 func WrapLogrus(p *logrus.Logger) ILogger {
 	return &DefaultLogger{p}
 }
 
-//DiscardLogger throws away everything
+// DiscardLogger throws away everything
 type DiscardLogger struct{}
 
-//Debug throws away logmessage
+// Debug throws away logmessage
 func (*DiscardLogger) Debug(args ...interface{}) {}
 
-//Debugf throws away logmessage
+// Debugf throws away logmessage
 func (*DiscardLogger) Debugf(format string, args ...interface{}) {}
 
-//Debugln throws away logmessage
+// Debugln throws away logmessage
 func (*DiscardLogger) Debugln(args ...interface{}) {}
 
-//Error throws away logmessage
+// Error throws away logmessage
 func (*DiscardLogger) Error(args ...interface{}) {}
 
-//Errorf throws away logmessage
+// Errorf throws away logmessage
 func (*DiscardLogger) Errorf(format string, args ...interface{}) {}
 
-//Errorln throws away logmessage
+// Errorln throws away logmessage
 func (*DiscardLogger) Errorln(args ...interface{}) {}
 
-//Fatal throws away logmessage
+// Fatal throws away logmessage
 func (*DiscardLogger) Fatal(args ...interface{}) {}
 
-//Fatalf throws away logmessage
+// Fatalf throws away logmessage
 func (*DiscardLogger) Fatalf(format string, args ...interface{}) {}
 
-//Fatalln throws away logmessage
+// Fatalln throws away logmessage
 func (*DiscardLogger) Fatalln(args ...interface{}) {}
 
-//Info throws away logmessage
+// Info throws away logmessage
 func (*DiscardLogger) Info(args ...interface{}) {}
 
-//Infof throws away logmessage
+// Infof throws away logmessage
 func (*DiscardLogger) Infof(format string, args ...interface{}) {}
 
-//Infoln throws away logmessage
+// Infoln throws away logmessage
 func (*DiscardLogger) Infoln(args ...interface{}) {}
 
-//Trace throws away logmessage
+// Trace throws away logmessage
 func (*DiscardLogger) Trace(args ...interface{}) {}
 
-//Tracef throws away logmessage
+// Tracef throws away logmessage
 func (*DiscardLogger) Tracef(format string, args ...interface{}) {}
 
-//Traceln throws away logmessage
+// Traceln throws away logmessage
 func (*DiscardLogger) Traceln(args ...interface{}) {}
 
-//Warn throws away logmessage
+// Warn throws away logmessage
 func (*DiscardLogger) Warn(args ...interface{}) {}
 
-//Warnf throws away logmessage
+// Warnf throws away logmessage
 func (*DiscardLogger) Warnf(format string, args ...interface{}) {}
 
-//Warning throws away logmessage
+// Warning throws away logmessage
 func (*DiscardLogger) Warning(args ...interface{}) {}
 
-//Warningf throws away logmessage
+// Warningf throws away logmessage
 func (*DiscardLogger) Warningf(format string, args ...interface{}) {}
 
-//Warningln throws away logmessage
+// Warningln throws away logmessage
 func (*DiscardLogger) Warningln(args ...interface{}) {}
 
-//Warnln throws away logmessage
+// Warnln throws away logmessage
 func (*DiscardLogger) Warnln(args ...interface{}) {}
 
-//NewDiscardLogger makes a discard logger
+// NewDiscardLogger makes a discard logger
 func NewDiscardLogger() ILogger {
 	return new(DiscardLogger)
 }
@@ -122,12 +125,12 @@ type SnmpLoggerAdapter struct {
 	ILogger
 }
 
-//Print wraps trace
+// Print wraps trace
 func (i *SnmpLoggerAdapter) Print(args ...interface{}) {
 	i.ILogger.Trace(args...)
 }
 
-//Printf wraps trace
+// Printf wraps trace
 func (i *SnmpLoggerAdapter) Printf(format string, args ...interface{}) {
 	i.ILogger.Tracef(format, args...)
 }

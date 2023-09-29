@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/gosnmp/gosnmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -142,14 +142,14 @@ func (suite *TrapTests) TestTraps() {
 			SecurityModel: gosnmp.UserSecurityModel,
 			MsgFlags:      gosnmp.AuthPriv,
 			//ContextName:   "public", //MUST have
-			Logger: gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger})
+			Logger: gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger}),
 			SecurityParameters: &gosnmp.UsmSecurityParameters{
 				UserName:                 "user",
 				AuthenticationProtocol:   gosnmp.SHA,
 				AuthenticationPassphrase: "password",
 				PrivacyProtocol:          gosnmp.AES,
 				PrivacyPassphrase:        "password",
-				Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger})
+				Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger}),
 			},
 		}
 
@@ -160,7 +160,7 @@ func (suite *TrapTests) TestTraps() {
 
 		trap := gosnmp.SnmpTrap{
 			Variables: []gosnmp.SnmpPDU{
-				gosnmp.SnmpPDU{
+				{
 					Name:  ".1.2.4.1",
 					Type:  gosnmp.OctetString,
 					Value: ".1.3.6.1.6.3.1.1.5.1",

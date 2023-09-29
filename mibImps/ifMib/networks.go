@@ -1,17 +1,21 @@
 package ifMib
 
-import "fmt"
-import "io/ioutil"
-import "runtime"
-import "strings"
-import "encoding/hex"
-import "github.com/gosnmp/gosnmp"
-import "github.com/eriksejr/GoSNMPServer"
-import "github.com/shirou/gopsutil/net"
-import "github.com/pkg/errors"
+import (
+	"encoding/hex"
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
+
+	"github.com/eriksejr/GoSNMPServer"
+	"github.com/gosnmp/gosnmp"
+	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
+)
 
 // NetworkOIDs Returns a list of network data.
-//   see http://www.net-snmp.org/docs/mibs/interfaces.html
+//
+//	see http://www.net-snmp.org/docs/mibs/interfaces.html
 func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 	toRet := []*GoSNMPServer.PDUValueControlItem{}
 	valInterfaces, err := net.Interfaces()
@@ -198,7 +202,7 @@ func appendLinuxPlatformNetworks(io *[]*GoSNMPServer.PDUValueControlItem, ifName
 			OnGet: func() (value interface{}, err error) {
 				adminstatus_up := 1
 				adminstatus_down := 2
-				_, err = ioutil.ReadFile(fmt.Sprintf("/sys/class/net/%s/carrier", ifName))
+				_, err = os.ReadFile(fmt.Sprintf("/sys/class/net/%s/carrier", ifName))
 				if err != nil {
 					return GoSNMPServer.Asn1IntegerWrap(int(adminstatus_down)), nil
 				}
@@ -219,7 +223,7 @@ func appendLinuxPlatformNetworks(io *[]*GoSNMPServer.PDUValueControlItem, ifName
 					"notPresent":     6,
 					"lowerLayerDown": 7,
 				}
-				bTs, err := ioutil.ReadFile(fmt.Sprintf("/sys/class/net/%s/operstate", ifName))
+				bTs, err := os.ReadFile(fmt.Sprintf("/sys/class/net/%s/operstate", ifName))
 				if err != nil {
 					return nil, err
 				}

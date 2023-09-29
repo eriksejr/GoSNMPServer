@@ -1,13 +1,15 @@
 package main
 
-import "os"
-import "strings"
-import "github.com/sirupsen/logrus"
-import "github.com/gosnmp/gosnmp"
-import "github.com/eriksejr/GoSNMPServer"
-import "github.com/eriksejr/GoSNMPServer/mibImps"
+import (
+	"os"
+	"strings"
 
-import "github.com/urfave/cli/v2"
+	"github.com/eriksejr/GoSNMPServer"
+	"github.com/eriksejr/GoSNMPServer/mibImps"
+	"github.com/gosnmp/gosnmp"
+	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
+)
 
 func makeApp() *cli.App {
 	return &cli.App{
@@ -74,14 +76,14 @@ func runServer(c *cli.Context) error {
 		},
 	}
 	logger.Infof("V3 Users:")
-	for _, val := range master.SecurityConfig.Users {
+	for i := range master.SecurityConfig.Users {
 		logger.Infof(
 			"\tUserName:%v\n\t -- AuthenticationProtocol:%v\n\t -- PrivacyProtocol:%v\n\t -- AuthenticationPassphrase:%v\n\t -- PrivacyPassphrase:%v",
-			val.UserName,
-			val.AuthenticationProtocol,
-			val.PrivacyProtocol,
-			val.AuthenticationPassphrase,
-			val.PrivacyPassphrase,
+			master.SecurityConfig.Users[i].UserName,
+			master.SecurityConfig.Users[i].AuthenticationProtocol,
+			master.SecurityConfig.Users[i].PrivacyProtocol,
+			master.SecurityConfig.Users[i].AuthenticationPassphrase,
+			master.SecurityConfig.Users[i].PrivacyPassphrase,
 		)
 	}
 	server := GoSNMPServer.NewSNMPServer(master)

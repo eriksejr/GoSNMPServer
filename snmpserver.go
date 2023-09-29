@@ -1,8 +1,11 @@
 package GoSNMPServer
 
-import "net"
-import "github.com/pkg/errors"
-import "reflect"
+import (
+	"net"
+	"reflect"
+
+	"github.com/pkg/errors"
+)
 
 type SNMPServer struct {
 	wconnStream ISnmpServerListener

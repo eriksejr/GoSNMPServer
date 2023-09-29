@@ -1,7 +1,10 @@
 package GoSNMPServer
 
-import "net"
-import "github.com/pkg/errors"
+import (
+	"net"
+
+	"github.com/pkg/errors"
+)
 
 type ISnmpServerListener interface {
 	SetupLogger(ILogger)

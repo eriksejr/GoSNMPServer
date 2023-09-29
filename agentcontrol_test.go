@@ -1,8 +1,8 @@
 package GoSNMPServer
 
-import "testing"
-
 import (
+	"testing"
+
 	"github.com/gosnmp/gosnmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -134,7 +134,7 @@ func (suite *ResponseForBufferTestSuite) TestSnmpv3EncryptedRequest() {
 			PrivacyProtocol:          gosnmp.DES,
 			AuthenticationPassphrase: "pippoxxx",
 			PrivacyPassphrase:        "PIPPOxxx",
-			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})
+			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger}),
 		},
 	}
 	handle.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})
@@ -174,7 +174,7 @@ func (suite *ResponseForBufferTestSuite) TestSnmpv3GetNextRequestInitial() {
 			PrivacyProtocol:          gosnmp.DES,
 			AuthenticationPassphrase: "testauth",
 			PrivacyPassphrase:        "testpriv",
-			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})
+			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger}),
 		},
 	}
 	handle.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})
@@ -215,7 +215,7 @@ func (suite *ResponseForBufferTestSuite) TestSnmpv3GetNextRequestEndofMib() {
 			PrivacyProtocol:          gosnmp.DES,
 			AuthenticationPassphrase: "testauth",
 			PrivacyPassphrase:        "testpriv",
-			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})
+			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger}),
 		},
 	}
 	handle.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})

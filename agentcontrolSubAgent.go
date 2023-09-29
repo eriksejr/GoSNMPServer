@@ -1,10 +1,13 @@
 package GoSNMPServer
 
-import "strings"
-import "fmt"
-import "sort"
-import "github.com/gosnmp/gosnmp"
-import "github.com/pkg/errors"
+import (
+	"fmt"
+	"sort"
+	"strings"
+
+	"github.com/gosnmp/gosnmp"
+	"github.com/pkg/errors"
+)
 
 type SubAgent struct {
 	// ContextName selects from SNMPV3 ContextName or SNMPV1/V2c community for switch from SubAgent...
@@ -70,9 +73,9 @@ func (t *SubAgent) checkPermission(whichPDU *PDUValueControlItem, request *gosnm
 
 func (t *SubAgent) getPDU(Name string, Type gosnmp.Asn1BER, Value interface{}) gosnmp.SnmpPDU {
 	return gosnmp.SnmpPDU{
-		Name:   Name,
-		Type:   Type,
-		Value:  Value,
+		Name:  Name,
+		Type:  Type,
+		Value: Value,
 	}
 }
 func (t *SubAgent) getPDUHelloVariable() gosnmp.SnmpPDU {
@@ -146,9 +149,9 @@ func (t *SubAgent) getForPDUValueControlResult(item *PDUValueControlItem,
 		return t.getPDUOctetString(item.OID, fmt.Sprintf("ERROR: %+v", err)), errret
 	}
 	return gosnmp.SnmpPDU{
-		Name:   item.OID,
-		Type:   item.Type,
-		Value:  valtoRet,
+		Name:  item.OID,
+		Type:  item.Type,
+		Value: valtoRet,
 	}, gosnmp.NoError
 }
 
@@ -184,9 +187,9 @@ func (t *SubAgent) trapForPDUValueControlResult(item *PDUValueControlItem,
 		return t.getPDUOctetString(item.OID, fmt.Sprintf("ERROR: %+v", err)), errret
 	}
 	return gosnmp.SnmpPDU{
-		Name:   item.OID,
-		Type:   item.Type,
-		Value:  valtoRet,
+		Name:  item.OID,
+		Type:  item.Type,
+		Value: valtoRet,
 	}, gosnmp.NoError
 }
 

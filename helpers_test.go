@@ -1,7 +1,10 @@
 package GoSNMPServer
 
-import "testing"
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestHelper_oidToByteString(t *testing.T) {
 	oidToByteString("1.2.3.4.5")

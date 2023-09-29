@@ -5,15 +5,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/host"
-	"github.com/gosnmp/gosnmp"
 )
 
 type FuncGetAuthoritativeEngineTime func() uint32
 
-//MasterAgent identifys software which runs on managed devices
-//            One server (port) could ONLY have one MasterAgent
+// MasterAgent identifys software which runs on managed devices
+//
+//	One server (port) could ONLY have one MasterAgent
 type MasterAgent struct {
 	SecurityConfig SecurityConfig
 
