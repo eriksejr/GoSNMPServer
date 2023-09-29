@@ -16,5 +16,5 @@ require (
 )
 
 replace github.com/slayercat/gosnmp => github.com/gosnmp/gosnmp v1.36.1
-replace github.com/slayercat/GoSNMPServer => ./
-replace github.com/slayercat/GoSNMPServer/mibImps => ./mibImps
+replace github.com/slayercat/GoSNMPServer => github.com/eriksejr/GoSNMPServer v0.0.0
+replace github.com/slayercat/GoSNMPServer/mibImps => github.com/eriksejr/GoSNMPServer/mibImps v0.0.0
