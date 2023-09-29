@@ -10,6 +10,14 @@ import (
 	"github.com/shirou/gopsutil/host"
 )
 
+type EnabledVersion uint8
+
+const (
+	SNMPV1 EnabledVersion = 1 << iota
+	SNMPV2c
+	SNMPV3
+)
+
 type FuncGetAuthoritativeEngineTime func() uint32
 
 // MasterAgent identifys software which runs on managed devices
@@ -21,6 +29,8 @@ type MasterAgent struct {
 	SubAgents []*SubAgent
 
 	Logger ILogger
+
+	AllowedVersion EnabledVersion
 
 	priv struct {
 		communityToSubAgent map[string]*SubAgent
@@ -128,11 +138,11 @@ func (t *MasterAgent) ResponseForBuffer(i []byte) ([]byte, error) {
 	vhandle.SecurityParameters = mb
 	request, decodeError := vhandle.SnmpDecodePacket(i)
 
-	switch request.Version {
-	case gosnmp.Version1, gosnmp.Version2c:
+	if (request.Version == gosnmp.Version1) && (t.AllowedVersion&SNMPV1 != 0) {
 		return t.marshalPkt(t.ResponseForPkt(request))
-		//
-	case gosnmp.Version3:
+	} else if (request.Version == gosnmp.Version2c) && (t.AllowedVersion&SNMPV2c != 0) {
+		return t.marshalPkt(t.ResponseForPkt(request))
+	} else if (request.Version == gosnmp.Version3) && (t.AllowedVersion&SNMPV3 != 0) {
 		// check for initial - discover response / non Privacy Items
 		if decodeError == nil && len(request.Variables) == 0 {
 			val, err := t.ResponseForPkt(request)
@@ -180,8 +190,9 @@ func (t *MasterAgent) ResponseForBuffer(i []byte) ([]byte, error) {
 
 			return t.marshalPkt(val, err)
 		}
+	} else {
+		return nil, errors.WithStack(ErrUnsupportedProtoVersion)
 	}
-	return nil, errors.WithStack(ErrUnsupportedProtoVersion)
 }
 
 func (t *MasterAgent) marshalPkt(pkt *gosnmp.SnmpPacket, err error) ([]byte, error) {
