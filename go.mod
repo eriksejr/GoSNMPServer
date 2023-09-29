@@ -14,3 +14,7 @@ require (
 	github.com/urfave/cli/v2 v2.1.1
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 )
+
+replace github.com/slayercat/gosnmp => github.com/gosnmp/gosnmp v1.36.1
+replace github.com/slayercat/GoSNMPServer => ./
+replace github.com/slayercat/GoSNMPServer/mibImps => ./mibImps
