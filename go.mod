@@ -1,4 +1,4 @@
-module GoSNMPServer
+module github.com/eriksejr/GoSNMPServer
 
 go 1.20
 
