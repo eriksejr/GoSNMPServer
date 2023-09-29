@@ -3,7 +3,7 @@ package GoSNMPServer
 import "testing"
 
 import (
-	"github.com/slayercat/gosnmp"
+	"github.com/gosnmp/gosnmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )

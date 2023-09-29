@@ -1,6 +1,6 @@
 package ucdMib
 
-import "github.com/slayercat/GoSNMPServer"
+import "github.com/eriksejr/GoSNMPServer"
 
 func init() {
 	g_Logger = GoSNMPServer.NewDiscardLogger()

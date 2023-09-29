@@ -7,16 +7,16 @@ linux/amd64 and linux/386.
 
 Build your own SNMP Server, try this:
 
-	go install github.com/slayercat/GoSNMPServer/cmd/gosnmpserver
+	go install github.com/eriksejr/GoSNMPServer/cmd/gosnmpserver
 	$(go env GOPATH)/bin/gosnmpserver run-server
 	snmpwalk -v 3 -l authPriv  -n public -u testuser   -a md5 -A testauth -x des -X testpriv 127.0.0.1:1161 1
 
 
 Some Code Here:
 
-	import "github.com/slayercat/gosnmp"
-	import "github.com/slayercat/GoSNMPServer"
-	import "github.com/slayercat/GoSNMPServer/mibImps"
+	import "github.com/gosnmp/gosnmp"
+	import "github.com/eriksejr/GoSNMPServer"
+	import "github.com/eriksejr/GoSNMPServer/mibImps"
 
 
 	master := GoSNMPServer.MasterAgent{
@@ -53,7 +53,7 @@ Serve your own oids
 
 This library provides some common oid for use.  See godoc for details.
 
-See https://github.com/slayercat/GoSNMPServer/tree/master/mibImps for code.
+See https://github.com/eriksejr/GoSNMPServer/tree/master/mibImps for code.
 
 Append `GoSNMPServer.PDUValueControlItem` to your SubAgent OIDS:
 

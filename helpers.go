@@ -2,7 +2,7 @@ package GoSNMPServer
 
 import (
 	"github.com/pkg/errors"
-	"github.com/slayercat/gosnmp"
+	"github.com/gosnmp/gosnmp"
 	"strconv"
 	"strings"
 )
