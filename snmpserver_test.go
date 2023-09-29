@@ -332,14 +332,13 @@ func (suite *ServerTests) TestGetSetOids() {
 			if err != nil {
 				panic(err)
 			}
-			gosnmp.Default.Logger = &SnmpLoggerAdapter{suite.Logger}
+			gosnmp.Default.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{suite.handle.Logger})
 			defer gosnmp.Default.Conn.Close()
 			suite.Run("Counter32", func() {
 				result, err := gosnmp.Default.Set([]gosnmp.SnmpPDU{
 					{Name: ".1.2.3.6",
 						Type:   gosnmp.Counter32,
 						Value:  Asn1Counter32Wrap(123),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -349,7 +348,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.2",
 						Type:   gosnmp.Null,
 						Value:  nil,
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -359,7 +357,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.8",
 						Type:   gosnmp.TimeTicks,
 						Value:  Asn1TimeTicksWrap(1238),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -369,7 +366,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.9",
 						Type:   gosnmp.Counter64,
 						Value:  Asn1Counter64Wrap(1239),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -379,7 +375,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.7",
 						Type:   gosnmp.Gauge32,
 						Value:  Asn1Gauge32Wrap(1239),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -389,7 +384,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.10",
 						Type:   gosnmp.Uinteger32,
 						Value:  Asn1Uinteger32Wrap(12310),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -399,7 +393,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.11",
 						Type:   gosnmp.OpaqueFloat,
 						Value:  Asn1OpaqueFloatWrap(123.11),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)
@@ -409,7 +402,6 @@ func (suite *ServerTests) TestGetSetOids() {
 					{Name: ".1.2.3.12",
 						Type:   gosnmp.OpaqueDouble,
 						Value:  Asn1OpaqueDoubleWrap(123.11),
-						Logger: gosnmp.Default.Logger,
 					}})
 				assert.Equal(suite.T(), nil, err)
 				assert.Equal(suite.T(), gosnmp.SNMPError(0x0), result.Error)

@@ -73,7 +73,6 @@ func (t *SubAgent) getPDU(Name string, Type gosnmp.Asn1BER, Value interface{}) g
 		Name:   Name,
 		Type:   Type,
 		Value:  Value,
-		Logger: &SnmpLoggerAdapter{t.Logger},
 	}
 }
 func (t *SubAgent) getPDUHelloVariable() gosnmp.SnmpPDU {
@@ -150,7 +149,6 @@ func (t *SubAgent) getForPDUValueControlResult(item *PDUValueControlItem,
 		Name:   item.OID,
 		Type:   item.Type,
 		Value:  valtoRet,
-		Logger: &SnmpLoggerAdapter{t.Logger},
 	}, gosnmp.NoError
 }
 
@@ -189,7 +187,6 @@ func (t *SubAgent) trapForPDUValueControlResult(item *PDUValueControlItem,
 		Name:   item.OID,
 		Type:   item.Type,
 		Value:  valtoRet,
-		Logger: &SnmpLoggerAdapter{t.Logger},
 	}, gosnmp.NoError
 }
 
@@ -276,7 +273,7 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 
 	// handle Non-Repeaters
 	t.Logger.Debugf("handle non-repeaters (%d)", i.NonRepeaters)
-	for j := uint8(0); j < i.NonRepeaters; j++ {
+	for j := 0; j < i.NonRepeaters; j++ {
 		queryForOid := i.Variables[j].Name
 		queryForOidStriped := strings.TrimLeft(queryForOid, ".0")
 		item, id := t.getForPDUValueControl(queryForOidStriped)
@@ -297,7 +294,7 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 
 	t.Logger.Debugf("handle remaining (%d, max-repetitions=%d)", vc-i.NonRepeaters, i.MaxRepetitions)
 	eomv := make(map[string]struct{})
-	for j := uint8(0); j < i.MaxRepetitions; j++ { // loop through repetitions
+	for j := uint32(0); j < i.MaxRepetitions; j++ { // loop through repetitions
 		for k := i.NonRepeaters; k < vc; k++ { // loop through "repeaters"
 			queryForOid := i.Variables[k].Name
 			queryForOidStriped := strings.TrimLeft(queryForOid, ".0")

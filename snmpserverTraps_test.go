@@ -142,14 +142,14 @@ func (suite *TrapTests) TestTraps() {
 			SecurityModel: gosnmp.UserSecurityModel,
 			MsgFlags:      gosnmp.AuthPriv,
 			//ContextName:   "public", //MUST have
-			Logger: &SnmpLoggerAdapter{suite.Logger},
+			Logger: gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger})
 			SecurityParameters: &gosnmp.UsmSecurityParameters{
 				UserName:                 "user",
 				AuthenticationProtocol:   gosnmp.SHA,
 				AuthenticationPassphrase: "password",
 				PrivacyProtocol:          gosnmp.AES,
 				PrivacyPassphrase:        "password",
-				Logger:                   &SnmpLoggerAdapter{suite.Logger},
+				Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger})
 			},
 		}
 
