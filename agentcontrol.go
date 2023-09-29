@@ -206,7 +206,7 @@ func (t *MasterAgent) marshalPkt(pkt *gosnmp.SnmpPacket, err error) ([]byte, err
 func (t *MasterAgent) getUsmSecurityParametersFromUser(username string) (*gosnmp.UsmSecurityParameters, error) {
 	if username == "" {
 		return &gosnmp.UsmSecurityParameters{
-			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{t.Logger})
+			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{t.Logger}),
 			AuthoritativeEngineID:    string(t.SecurityConfig.AuthoritativeEngineID.Marshal()),
 			AuthoritativeEngineBoots: t.SecurityConfig.AuthoritativeEngineBoots,
 			AuthoritativeEngineTime:  t.SecurityConfig.OnGetAuthoritativeEngineTime(),
