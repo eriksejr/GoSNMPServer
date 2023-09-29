@@ -273,7 +273,7 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 
 	// handle Non-Repeaters
 	t.Logger.Debugf("handle non-repeaters (%d)", i.NonRepeaters)
-	for j := 0; j < i.NonRepeaters; j++ {
+	for j := uint8(0); j < i.NonRepeaters; j++ {
 		queryForOid := i.Variables[j].Name
 		queryForOidStriped := strings.TrimLeft(queryForOid, ".0")
 		item, id := t.getForPDUValueControl(queryForOidStriped)
