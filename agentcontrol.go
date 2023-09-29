@@ -173,8 +173,8 @@ func (t *MasterAgent) ResponseForBuffer(i []byte) ([]byte, error) {
 			return t.marshalPkt(request, err)
 		} else {
 			securityParamters := usm
-			GenKeys(securityParameters)
-			GenSalt(securityParameters)
+			GenKeys(securityParamters)
+			GenSalt(securityParamters)
 			val.SecurityParameters = securityParamters
 
 			return t.marshalPkt(val, err)
