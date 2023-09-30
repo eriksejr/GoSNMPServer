@@ -3,23 +3,24 @@ package GoSNMPServer
 import (
 	"net"
 	"reflect"
+	"sync/atomic"
 
 	"github.com/pkg/errors"
 )
 
 type SNMPServer struct {
 	wconnStream ISnmpServerListener
-	master      MasterAgent
+	master      *atomic.Pointer[MasterAgent]
 	logger      ILogger
 }
 
-func NewSNMPServer(master MasterAgent) *SNMPServer {
+func NewSNMPServer(master *atomic.Pointer[MasterAgent]) *SNMPServer {
 	ret := new(SNMPServer)
-	if err := master.ReadyForWork(); err != nil {
+	if err := master.Load().ReadyForWork(); err != nil {
 		panic(err)
 	}
 	ret.master = master
-	ret.logger = master.Logger
+	ret.logger = master.Load().Logger
 	return ret
 }
 
@@ -85,7 +86,7 @@ func (server *SNMPServer) ServeNextRequest() (err error) {
 	if err != nil {
 		return err
 	}
-	result, err := server.master.ResponseForBuffer(bytePDU)
+	result, err := server.master.Load().ResponseForBuffer(bytePDU)
 	if err != nil {
 		v := "with"
 		if len(result) == 0 {

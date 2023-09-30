@@ -5,6 +5,7 @@ import (
 	"net"
 	"os/exec"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/gosnmp/gosnmp"
@@ -141,7 +142,9 @@ func (suite *ServerTests) TestErrors() {
 			},
 		},
 	}
-	shandle := NewSNMPServer(master)
+	atomicMA := atomic.Pointer[MasterAgent]{}
+	atomicMA.Store(&master)
+	shandle := NewSNMPServer(&atomicMA)
 	shandle.ListenUDP("udp4", ":0")
 	var stopWaitChain = make(chan int)
 	go func() {
@@ -256,7 +259,9 @@ func (suite *ServerTests) TestGetSetOids() {
 			},
 		},
 	}
-	shandle := NewSNMPServer(master)
+	atomicMA := atomic.Pointer[MasterAgent]{}
+	atomicMA.Store(&master)
+	shandle := NewSNMPServer(&atomicMA)
 	shandle.ListenUDP("udp4", ":0")
 	var stopWaitChain = make(chan int)
 	go func() {

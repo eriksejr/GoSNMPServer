@@ -3,6 +3,7 @@ package GoSNMPServer
 import (
 	"net"
 	"os/exec"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -68,7 +69,9 @@ func (suite *TrapTests) TestTraps() {
 			},
 		},
 	}
-	shandle := NewSNMPServer(master)
+	atomicMA := atomic.Pointer[MasterAgent]{}
+	atomicMA.Store(&master)
+	shandle := NewSNMPServer(&atomicMA)
 	shandle.ListenUDP("udp4", ":0")
 	var stopWaitChain = make(chan int)
 	go func() {
@@ -226,7 +229,9 @@ func (suite *TrapTests) TestErrorTraps() {
 			},
 		},
 	}
-	shandle := NewSNMPServer(master)
+	atomicMA := atomic.Pointer[MasterAgent]{}
+	atomicMA.Store(&master)
+	shandle := NewSNMPServer(&atomicMA)
 	shandle.ListenUDP("udp4", ":0")
 	var stopWaitChain = make(chan int)
 	go func() {

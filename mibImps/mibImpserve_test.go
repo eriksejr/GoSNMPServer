@@ -2,16 +2,17 @@ package mibImps
 
 import (
 	"bytes"
-	"github.com/sirupsen/logrus"
-	"github.com/gosnmp/gosnmp"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"net"
 	"os/exec"
+	"sync/atomic"
 	"testing"
-)
 
-import "github.com/eriksejr/GoSNMPServer"
+	"github.com/eriksejr/GoSNMPServer"
+	"github.com/gosnmp/gosnmp"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+)
 
 type SnmpServerTestSuite struct {
 	suite.Suite
@@ -48,8 +49,10 @@ func (suite *SnmpServerTestSuite) SetupTest() {
 			},
 		},
 	}
-	suite.master = &master
-	suite.shandle = GoSNMPServer.NewSNMPServer(master)
+	atomicMA := atomic.Pointer[GoSNMPServer.MasterAgent]{}
+	atomicMA.Store(&master)
+	suite.master = atomicMA.Load()
+	suite.shandle = GoSNMPServer.NewSNMPServer(&atomicMA)
 	suite.shandle.ListenUDP("udp4", ":0")
 	go func() {
 		err := suite.shandle.ServeForever()

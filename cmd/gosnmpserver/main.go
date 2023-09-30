@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"strings"
+	"sync/atomic"
 
 	"github.com/eriksejr/GoSNMPServer"
 	"github.com/eriksejr/GoSNMPServer/mibImps"
@@ -86,7 +87,9 @@ func runServer(c *cli.Context) error {
 			master.SecurityConfig.Users[i].PrivacyPassphrase,
 		)
 	}
-	server := GoSNMPServer.NewSNMPServer(master)
+	atomicMA := atomic.Pointer[GoSNMPServer.MasterAgent]{}
+	atomicMA.Store(&master)
+	server := GoSNMPServer.NewSNMPServer(&atomicMA)
 	err := server.ListenUDP("udp", c.String("bindTo"))
 	if err != nil {
 		logger.Errorf("Error in listen: %+v", err)
