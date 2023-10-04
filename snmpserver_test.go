@@ -2,21 +2,22 @@ package GoSNMPServer
 
 import (
 	"bytes"
+	"log"
 	"net"
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
 
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type ServerTests struct {
 	suite.Suite
-	Logger ILogger
+	Logger *log.Logger
 
 	privGetSetOIDS struct {
 		val_Integer          int
@@ -34,8 +35,7 @@ type ServerTests struct {
 }
 
 func (suite *ServerTests) SetupTest() {
-	logger := NewDefaultLogger()
-	logger.(*DefaultLogger).Level = logrus.TraceLevel
+	logger := log.New(os.Stdout, "ServerTest", 0)
 	suite.Logger = logger
 }
 
@@ -47,7 +47,7 @@ func (suite *ServerTests) TestNewDiscardLoggerReadyForWork() {
 	}
 	err := master.ReadyForWork()
 	assert.Nil(suite.T(), err)
-	assert.IsType(suite.T(), master.Logger, &DiscardLogger{})
+	assert.IsType(suite.T(), master.Logger, suite.Logger)
 }
 
 func (suite *ServerTests) TestErrors() {
@@ -147,9 +147,9 @@ func (suite *ServerTests) TestErrors() {
 	go func() {
 		err := shandle.ServeForever()
 		if err != nil {
-			suite.Logger.Errorf("error in ServeForever: %v", err)
+			suite.Logger.Printf("error in ServeForever: %v\n", err)
 		} else {
-			suite.Logger.Info("ServeForever Stoped.")
+			suite.Logger.Println("ServeForever Stoped.")
 		}
 		stopWaitChain <- 1
 
@@ -262,9 +262,9 @@ func (suite *ServerTests) TestGetSetOids() {
 	go func() {
 		err := shandle.ServeForever()
 		if err != nil {
-			suite.Logger.Errorf("error in ServeForever: %v", err)
+			suite.Logger.Printf("error in ServeForever: %v\n", err)
 		} else {
-			suite.Logger.Info("ServeForever Stoped.")
+			suite.Logger.Println("ServeForever Stoped.")
 		}
 		stopWaitChain <- 1
 
@@ -332,7 +332,7 @@ func (suite *ServerTests) TestGetSetOids() {
 			if err != nil {
 				panic(err)
 			}
-			gosnmp.Default.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger})
+			gosnmp.Default.Logger = gosnmp.NewLogger(suite.Logger)
 			defer gosnmp.Default.Conn.Close()
 			suite.Run("Counter32", func() {
 				result, err := gosnmp.Default.Set([]gosnmp.SnmpPDU{
@@ -481,9 +481,9 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				return Asn1ObjectIdentifierWrap(target), nil
 			},
 			OnSet: func(value interface{}) (err error) {
-				suite.Logger.Info("set ObjectIdentifier. value=", value)
+				suite.Logger.Printf("set ObjectIdentifier. value=", value)
 				val := Asn1ObjectIdentifierUnwrap(value)
-				suite.Logger.Infof("after Asn1ObjectIdentifierUnwrap %v->%v", value, val)
+				suite.Logger.Printf("after Asn1ObjectIdentifierUnwrap %v->%v\n", value, val)
 				if !IsValidObjectIdentifier(val) {
 					return errors.New("not a valid oid")
 				}

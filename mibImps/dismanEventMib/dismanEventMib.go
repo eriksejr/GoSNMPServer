@@ -1,19 +1,22 @@
 package dismanEventMib
 
 import (
+	"log"
+	"os"
+
 	"github.com/eriksejr/GoSNMPServer"
 	"github.com/gosnmp/gosnmp"
 	"github.com/shirou/gopsutil/host"
 )
 
 func init() {
-	g_Logger = GoSNMPServer.NewDiscardLogger()
+	g_Logger = log.New(os.Stdout, "dismanEventMib", 0)
 }
 
-var g_Logger GoSNMPServer.ILogger
+var g_Logger *log.Logger
 
 // SetupLogger Setups Logger for this mib
-func SetupLogger(i GoSNMPServer.ILogger) {
+func SetupLogger(i *log.Logger) {
 	g_Logger = i
 }
 

@@ -2,6 +2,7 @@ package GoSNMPServer
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 
@@ -21,7 +22,7 @@ type SubAgent struct {
 	// UserErrorMarkPacket decides if shll treat user returned error as generr
 	UserErrorMarkPacket bool
 
-	Logger ILogger
+	Logger *log.Logger
 
 	master *MasterAgent
 }
@@ -35,11 +36,11 @@ func (t *SubAgent) SyncConfig() error {
 			return err
 		}
 	}
-	t.Logger.Debugf("Total OIDs of %v: %v", t.CommunityIDs, len(t.OIDs))
+	t.Logger.Printf("Total OIDs of %v: %v\n", t.CommunityIDs, len(t.OIDs))
 
 	sort.Sort(byOID(t.OIDs))
 	for id, each := range t.OIDs {
-		t.Logger.Infof("OIDs of %v: %v", t.CommunityIDs, each.OID)
+		t.Logger.Printf("OIDs of %v: %v\n", t.CommunityIDs, each.OID)
 		if id != 0 && t.OIDs[id].OID == t.OIDs[id-1].OID {
 			return fmt.Errorf("community %v: meet duplicate oid %v", t.CommunityIDs, each.OID)
 		}
@@ -195,12 +196,12 @@ func (t *SubAgent) trapForPDUValueControlResult(item *PDUValueControlItem,
 
 func (t *SubAgent) serveGetRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
-	t.Logger.Debugf("before copy: %v...After copy:%v",
+	t.Logger.Printf("before copy: %v...After copy:%v\n",
 		i.SecurityParameters.(*gosnmp.UsmSecurityParameters),
 		ret.SecurityParameters.(*gosnmp.UsmSecurityParameters))
 	ret.PDUType = gosnmp.GetResponse
 	ret.Variables = []gosnmp.SnmpPDU{}
-	t.Logger.Debugf("i.Version == %v len(i.Variables) = %v.", i.Version, len(i.Variables))
+	t.Logger.Printf("i.Version == %v len(i.Variables) = %v.\n", i.Version, len(i.Variables))
 	if i.Version == gosnmp.Version3 && len(i.Variables) == 0 {
 		// SNMP V3 hello packet
 		mb, _ := t.master.getUsmSecurityParametersFromUser("")
@@ -234,13 +235,13 @@ func (t *SubAgent) serveGetRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, er
 
 func (t *SubAgent) serveTrap(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
-	t.Logger.Debugf("before copy: %v...After copy:%v",
+	t.Logger.Printf("before copy: %v...After copy:%v\n",
 		i.SecurityParameters.(*gosnmp.UsmSecurityParameters),
 		ret.SecurityParameters.(*gosnmp.UsmSecurityParameters))
 
 	ret.PDUType = gosnmp.GetResponse
 	ret.Variables = []gosnmp.SnmpPDU{}
-	t.Logger.Debugf("i.Version == %v len(i.Variables) = %v.", i.Version, len(i.Variables))
+	t.Logger.Printf("i.Version == %v len(i.Variables) = %v.\n", i.Version, len(i.Variables))
 	for id, varItem := range i.Variables {
 		item, _ := t.getForPDUValueControl(varItem.Name)
 		if item == nil {
@@ -272,15 +273,15 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 	ret.PDUType = gosnmp.GetResponse
 	ret.Variables = []gosnmp.SnmpPDU{}
 	vc := uint8(len(i.Variables))
-	t.Logger.Debugf("serveGetBulkRequest (vars=%d, non-repeaters=%d, max-repetitions=%d", vc, i.NonRepeaters, i.MaxRepetitions)
+	t.Logger.Printf("serveGetBulkRequest (vars=%d, non-repeaters=%d, max-repetitions=%d\n", vc, i.NonRepeaters, i.MaxRepetitions)
 
 	// handle Non-Repeaters
-	t.Logger.Debugf("handle non-repeaters (%d)", i.NonRepeaters)
+	t.Logger.Printf("handle non-repeaters (%d)\n", i.NonRepeaters)
 	for j := uint8(0); j < i.NonRepeaters; j++ {
 		queryForOid := i.Variables[j].Name
 		queryForOidStriped := strings.TrimLeft(queryForOid, ".0")
 		item, id := t.getForPDUValueControl(queryForOidStriped)
-		t.Logger.Debugf("(non-repeater) t.getForPDUValueControl. query_for_oid=%v item=%v id=%v", queryForOid, item, id)
+		t.Logger.Printf("(non-repeater) t.getForPDUValueControl. query_for_oid=%v item=%v id=%v\n", queryForOid, item, id)
 		if id >= len(t.OIDs) {
 			ret.Variables = append(ret.Variables, t.getPDUEndOfMibView(queryForOid))
 			continue
@@ -295,7 +296,7 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 		ret.Variables = append(ret.Variables, ctl)
 	}
 
-	t.Logger.Debugf("handle remaining (%d, max-repetitions=%d)", vc-i.NonRepeaters, i.MaxRepetitions)
+	t.Logger.Printf("handle remaining (%d, max-repetitions=%d)\n", vc-i.NonRepeaters, i.MaxRepetitions)
 	eomv := make(map[string]struct{})
 	for j := uint32(0); j < i.MaxRepetitions; j++ { // loop through repetitions
 		for k := i.NonRepeaters; k < vc; k++ { // loop through "repeaters"
@@ -314,7 +315,7 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 				continue
 			}
 			item = t.OIDs[nextIndex] // repetition next
-			t.Logger.Debugf("t.getForPDUValueControl. query_for_oid=%v item=%v id=%v", queryForOid, item, id)
+			t.Logger.Printf("t.getForPDUValueControl. query_for_oid=%v item=%v id=%v\n", queryForOid, item, id)
 			ctl, snmperr := t.getForPDUValueControlResult(item, i)
 			if snmperr != gosnmp.NoError && ret.Error == gosnmp.NoError {
 				ret.Error = snmperr
@@ -335,9 +336,9 @@ func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 	length := len(i.Variables)
 	queryForOid := i.Variables[length-1].Name
 	queryForOidStriped := strings.TrimLeft(queryForOid, ".0")
-	t.Logger.Debugf("serveGetNextRequest of %v", queryForOid)
+	t.Logger.Printf("serveGetNextRequest of %v\n", queryForOid)
 	item, id := t.getForPDUValueControl(queryForOidStriped)
-	t.Logger.Debugf("t.getForPDUValueControl. query_for_oid=%v item=%v id=%v", queryForOid, item, id)
+	t.Logger.Printf("t.getForPDUValueControl. query_for_oid=%v item=%v id=%v\n", queryForOid, item, id)
 	if item != nil {
 		id += 1
 	}
@@ -352,7 +353,7 @@ func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 	if length+id > len(t.OIDs) {
 		length = len(t.OIDs) - id
 	}
-	t.Logger.Debugf("i.Variables[id: length]. id=%v length =%v. len(t.OIDs)=%v", id, length, len(t.OIDs))
+	t.Logger.Printf("i.Variables[id: length]. id=%v length =%v. len(t.OIDs)=%v\n", id, length, len(t.OIDs))
 	iid := id
 	for {
 		if iid >= len(t.OIDs) {
@@ -364,7 +365,7 @@ func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 		}
 
 		if item.NonWalkable || item.OnGet == nil {
-			t.Logger.Debugf("getnext: oid=%v. skip for non walkable", item.OID)
+			t.Logger.Printf("getnext: oid=%v. skip for non walkable\n", item.OID)
 			iid += 1
 			continue // skip non-walkable items
 		}
@@ -373,7 +374,7 @@ func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 			ret.Error = snmperr
 			ret.ErrorIndex = uint8(iid)
 		}
-		t.Logger.Debugf("getnext: append oid=%v. result=%v err=%v", item.OID, ctl, snmperr)
+		t.Logger.Printf("getnext: append oid=%v. result=%v err=%v\n", item.OID, ctl, snmperr)
 		ret.Variables = append(ret.Variables, ctl)
 		iid += 1
 	}

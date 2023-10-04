@@ -1,6 +1,8 @@
 package GoSNMPServer
 
 import (
+	"io"
+	"log"
 	"reflect"
 	"strings"
 	"time"
@@ -28,7 +30,7 @@ type MasterAgent struct {
 
 	SubAgents []*SubAgent
 
-	Logger ILogger
+	Logger *log.Logger
 
 	AllowedVersion EnabledVersion
 
@@ -101,7 +103,7 @@ func (t *MasterAgent) syncAndCheck() error {
 
 	if t.Logger == nil {
 		//Set New NIL Logger
-		t.Logger = NewDiscardLogger()
+		t.Logger = log.New(io.Discard, "", 0)
 	}
 	if t.SecurityConfig.OnGetAuthoritativeEngineTime == nil {
 		t.SecurityConfig.OnGetAuthoritativeEngineTime = DefaultGetAuthoritativeEngineTime
@@ -133,7 +135,7 @@ func (t *MasterAgent) getUserNameFromRequest(request *gosnmp.SnmpPacket) string 
 func (t *MasterAgent) ResponseForBuffer(i []byte) ([]byte, error) {
 	// Decode
 	vhandle := gosnmp.GoSNMP{}
-	vhandle.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{t.Logger})
+	vhandle.Logger = gosnmp.NewLogger(t.Logger)
 	mb, _ := t.getUsmSecurityParametersFromUser("")
 	vhandle.SecurityParameters = mb
 	request, decodeError := vhandle.SnmpDecodePacket(i)
@@ -163,7 +165,7 @@ func (t *MasterAgent) ResponseForBuffer(i []byte) ([]byte, error) {
 			return nil, err
 		}
 		if decodeError != nil {
-			t.Logger.Debugf("v3 decode [will fail with non password] meet %v", err)
+			t.Logger.Printf("v3 decode [will fail with non password] meet %v\n", err)
 			vhandle.SecurityParameters = &gosnmp.UsmSecurityParameters{
 				UserName:                 usm.UserName,
 				AuthenticationProtocol:   usm.AuthenticationProtocol,
@@ -201,7 +203,7 @@ func (t *MasterAgent) marshalPkt(pkt *gosnmp.SnmpPacket, err error) ([]byte, err
 		pkt = &gosnmp.SnmpPacket{}
 	}
 	if err != nil {
-		t.Logger.Debugf("Will marshal: %v", err)
+		t.Logger.Printf("Will marshal: %v\n", err)
 
 		errFill := t.fillErrorPkt(err, pkt)
 		if errFill != nil {
@@ -218,7 +220,7 @@ func (t *MasterAgent) marshalPkt(pkt *gosnmp.SnmpPacket, err error) ([]byte, err
 func (t *MasterAgent) getUsmSecurityParametersFromUser(username string) (*gosnmp.UsmSecurityParameters, error) {
 	if username == "" {
 		return &gosnmp.UsmSecurityParameters{
-			Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{t.Logger}),
+			Logger:                   gosnmp.NewLogger(t.Logger),
 			AuthoritativeEngineID:    string(t.SecurityConfig.AuthoritativeEngineID.Marshal()),
 			AuthoritativeEngineBoots: t.SecurityConfig.AuthoritativeEngineBoots,
 			AuthoritativeEngineTime:  t.SecurityConfig.OnGetAuthoritativeEngineTime(),
@@ -227,7 +229,7 @@ func (t *MasterAgent) getUsmSecurityParametersFromUser(username string) (*gosnmp
 	}
 	if val := t.SecurityConfig.FindForUser(username); val != nil {
 		fval := val.Copy().(*gosnmp.UsmSecurityParameters)
-		fval.Logger = gosnmp.NewLogger(&SnmpLoggerAdapter{t.Logger})
+		fval.Logger = gosnmp.NewLogger(t.Logger)
 		fval.AuthoritativeEngineID = string(t.SecurityConfig.AuthoritativeEngineID.Marshal())
 		fval.AuthoritativeEngineBoots = t.SecurityConfig.AuthoritativeEngineBoots
 		fval.AuthoritativeEngineTime = t.SecurityConfig.OnGetAuthoritativeEngineTime()
@@ -287,7 +289,7 @@ func (t *MasterAgent) SyncConfig() error {
 			if _, exists := t.priv.communityToSubAgent[val]; exists {
 				return errors.Errorf("SyncConfig: Config Error: duplicate value:%s", val)
 			}
-			t.Logger.Debugf("communityToSubAgent: val=%v, current=%p", val, current)
+			t.Logger.Printf("communityToSubAgent: val=%v, current=%p\n", val, current)
 			t.priv.communityToSubAgent[val] = current
 		}
 

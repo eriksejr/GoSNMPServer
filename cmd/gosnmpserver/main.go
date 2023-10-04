@@ -1,13 +1,12 @@
 package main
 
 import (
+	"log"
 	"os"
-	"strings"
 
 	"github.com/eriksejr/GoSNMPServer"
 	"github.com/eriksejr/GoSNMPServer/mibImps"
 	"github.com/gosnmp/gosnmp"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -39,19 +38,7 @@ func main() {
 }
 
 func runServer(c *cli.Context) error {
-	logger := GoSNMPServer.NewDefaultLogger()
-	switch strings.ToLower(c.String("logLevel")) {
-	case "fatal":
-		logger.(*GoSNMPServer.DefaultLogger).Level = logrus.FatalLevel
-	case "error":
-		logger.(*GoSNMPServer.DefaultLogger).Level = logrus.ErrorLevel
-	case "info":
-		logger.(*GoSNMPServer.DefaultLogger).Level = logrus.InfoLevel
-	case "debug":
-		logger.(*GoSNMPServer.DefaultLogger).Level = logrus.DebugLevel
-	case "trace":
-		logger.(*GoSNMPServer.DefaultLogger).Level = logrus.TraceLevel
-	}
+	logger := log.New(os.Stdout, "Main", 0)
 	mibImps.SetupLogger(logger)
 
 	master := GoSNMPServer.MasterAgent{
@@ -75,10 +62,10 @@ func runServer(c *cli.Context) error {
 			},
 		},
 	}
-	logger.Infof("V3 Users:")
+	logger.Println("V3 Users:")
 	for i := range master.SecurityConfig.Users {
-		logger.Infof(
-			"\tUserName:%v\n\t -- AuthenticationProtocol:%v\n\t -- PrivacyProtocol:%v\n\t -- AuthenticationPassphrase:%v\n\t -- PrivacyPassphrase:%v",
+		logger.Printf(
+			"\tUserName:%v\n\t -- AuthenticationProtocol:%v\n\t -- PrivacyProtocol:%v\n\t -- AuthenticationPassphrase:%v\n\t -- PrivacyPassphrase:%v\n",
 			master.SecurityConfig.Users[i].UserName,
 			master.SecurityConfig.Users[i].AuthenticationProtocol,
 			master.SecurityConfig.Users[i].PrivacyProtocol,
@@ -89,7 +76,7 @@ func runServer(c *cli.Context) error {
 	server := GoSNMPServer.NewSNMPServer(master)
 	err := server.ListenUDP("udp", c.String("bindTo"))
 	if err != nil {
-		logger.Errorf("Error in listen: %+v", err)
+		logger.Printf("Error in listen: %+v\n", err)
 	}
 	server.ServeForever()
 	return nil

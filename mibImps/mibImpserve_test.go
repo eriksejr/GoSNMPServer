@@ -2,29 +2,29 @@ package mibImps
 
 import (
 	"bytes"
-	"github.com/sirupsen/logrus"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"testing"
+
+	"github.com/eriksejr/GoSNMPServer"
 	"github.com/gosnmp/gosnmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"net"
-	"os/exec"
-	"testing"
 )
-
-import "github.com/eriksejr/GoSNMPServer"
 
 type SnmpServerTestSuite struct {
 	suite.Suite
 
-	Logger GoSNMPServer.ILogger
+	Logger *log.Logger
 
 	master  *GoSNMPServer.MasterAgent
 	shandle *GoSNMPServer.SNMPServer
 }
 
 func (suite *SnmpServerTestSuite) SetupTest() {
-	logger := GoSNMPServer.NewDefaultLogger()
-	logger.(*GoSNMPServer.DefaultLogger).Level = logrus.InfoLevel
+	logger := log.New(os.Stdout, "suite", 0)
 	suite.Logger = logger
 	SetupLogger(suite.Logger)
 	master := GoSNMPServer.MasterAgent{

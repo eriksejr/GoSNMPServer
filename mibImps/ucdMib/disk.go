@@ -28,7 +28,7 @@ func DiskUsageOIDs(showTheseNameOnly ...NameOverride) []*GoSNMPServer.PDUValueCo
 	if len(showTheseNameOnly) == 0 {
 		partitionStats, err := disk.Partitions(false)
 		if err != nil {
-			g_Logger.Errorf("Load partitionStats failed, err=%v", err)
+			g_Logger.Printf("Load partitionStats failed, err=%v\n", err)
 			return []*GoSNMPServer.PDUValueControlItem{}
 		}
 		for _, val := range partitionStats {

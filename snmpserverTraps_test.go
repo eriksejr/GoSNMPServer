@@ -1,26 +1,26 @@
 package GoSNMPServer
 
 import (
+	"log"
 	"net"
+	"os"
 	"os/exec"
 	"testing"
 	"time"
 
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type TrapTests struct {
 	suite.Suite
-	Logger ILogger
+	Logger *log.Logger
 }
 
 func (suite *TrapTests) SetupTest() {
-	logger := NewDefaultLogger()
-	logger.(*DefaultLogger).Level = logrus.TraceLevel
+	logger := log.New(os.Stdout, "TrapTest", 0)
 	suite.Logger = logger
 }
 
@@ -74,9 +74,9 @@ func (suite *TrapTests) TestTraps() {
 	go func() {
 		err := shandle.ServeForever()
 		if err != nil {
-			suite.Logger.Errorf("error in ServeForever: %v", err)
+			suite.Logger.Printf("error in ServeForever: %v\n", err)
 		} else {
-			suite.Logger.Info("ServeForever Stoped.")
+			suite.Logger.Println("ServeForever Stoped.")
 		}
 		stopWaitChain <- 1
 
@@ -142,14 +142,14 @@ func (suite *TrapTests) TestTraps() {
 			SecurityModel: gosnmp.UserSecurityModel,
 			MsgFlags:      gosnmp.AuthPriv,
 			//ContextName:   "public", //MUST have
-			Logger: gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger}),
+			Logger: gosnmp.NewLogger(suite.Logger),
 			SecurityParameters: &gosnmp.UsmSecurityParameters{
 				UserName:                 "user",
 				AuthenticationProtocol:   gosnmp.SHA,
 				AuthenticationPassphrase: "password",
 				PrivacyProtocol:          gosnmp.AES,
 				PrivacyPassphrase:        "password",
-				Logger:                   gosnmp.NewLogger(&SnmpLoggerAdapter{suite.Logger}),
+				Logger:                   gosnmp.NewLogger(suite.Logger),
 			},
 		}
 
@@ -232,9 +232,9 @@ func (suite *TrapTests) TestErrorTraps() {
 	go func() {
 		err := shandle.ServeForever()
 		if err != nil {
-			suite.Logger.Errorf("error in ServeForever: %v", err)
+			suite.Logger.Printf("error in ServeForever: %v\n", err)
 		} else {
-			suite.Logger.Info("ServeForever Stoped.")
+			suite.Logger.Println("ServeForever Stoped.")
 		}
 		stopWaitChain <- 1
 

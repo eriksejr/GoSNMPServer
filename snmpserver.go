@@ -1,6 +1,7 @@
 package GoSNMPServer
 
 import (
+	"log"
 	"net"
 	"reflect"
 
@@ -10,7 +11,7 @@ import (
 type SNMPServer struct {
 	wconnStream ISnmpServerListener
 	master      MasterAgent
-	logger      ILogger
+	logger      *log.Logger
 }
 
 func NewSNMPServer(master MasterAgent) *SNMPServer {
@@ -31,7 +32,7 @@ func (server *SNMPServer) ListenUDP(l3proto, address string) error {
 	if err != nil {
 		return err
 	}
-	server.logger.Infof("ListenUDP: l3proto=%s, address=%s", l3proto, address)
+	server.logger.Printf("ListenUDP: l3proto=%s, address=%s\n", l3proto, address)
 	i.SetupLogger(server.logger)
 	server.wconnStream = i
 	return nil
@@ -42,7 +43,7 @@ func (server *SNMPServer) Address() net.Addr {
 }
 
 func (server *SNMPServer) Shutdown() {
-	server.logger.Infof("Shutdown server")
+	server.logger.Println("Shutdown server")
 	if server.wconnStream != nil {
 		server.wconnStream.Shutdown()
 	}
@@ -58,11 +59,11 @@ func (server *SNMPServer) ServeForever() error {
 		if err != nil {
 			var opError *net.OpError
 			if errors.As(err, &opError) {
-				server.logger.Debugf("ServeForever: break because of serveNextRequest error %v", opError)
+				server.logger.Printf("ServeForever: break because of serveNextRequest error %v\n", opError)
 				return nil
 			}
 
-			server.logger.Errorf("ServeForever: ServeNextRequest error %v [type %v]", err, reflect.TypeOf(err))
+			server.logger.Printf("ServeForever: ServeNextRequest error %v [type %v]\n", err, reflect.TypeOf(err))
 			return errors.Wrap(err, "ServeNextRequest")
 		}
 	}
@@ -77,7 +78,7 @@ func (server *SNMPServer) ServeNextRequest() (err error) {
 			default:
 				err = errors.Errorf("ServeNextRequest fails with panic. err(type %v)=%v", reflect.TypeOf(err), err)
 			}
-			server.logger.Errorf("ServeNextRequest error: %+v", err)
+			server.logger.Printf("ServeNextRequest error: %+v\n", err)
 			return
 		}
 	}()
@@ -91,11 +92,11 @@ func (server *SNMPServer) ServeNextRequest() (err error) {
 		if len(result) == 0 {
 			v = "without"
 		}
-		server.logger.Warnf("ResponseForBuffer Error: %v. %s result", err, v)
+		server.logger.Printf("ResponseForBuffer Error: %v. %s result\n", err, v)
 	}
 	if len(result) != 0 {
 		if errreply := replyer.ReplyPDU(result); errreply != nil {
-			server.logger.Errorf("Reply PDU meet err:", errreply)
+			server.logger.Println("Reply PDU meet err:", errreply)
 			replyer.Shutdown()
 			return nil
 		}

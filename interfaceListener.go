@@ -1,13 +1,15 @@
 package GoSNMPServer
 
 import (
+	"io"
+	"log"
 	"net"
 
 	"github.com/pkg/errors"
 )
 
 type ISnmpServerListener interface {
-	SetupLogger(ILogger)
+	SetupLogger(*log.Logger)
 	Address() net.Addr
 	NextSnmp() (snmpbytes []byte, replyer IReplyer, err error)
 	Shutdown()
@@ -20,12 +22,12 @@ type IReplyer interface {
 
 type UDPListener struct {
 	conn   *net.UDPConn
-	logger ILogger
+	logger *log.Logger
 }
 
 func NewUDPListener(l3proto, address string) (ISnmpServerListener, error) {
 	ret := new(UDPListener)
-	ret.logger = NewDiscardLogger()
+	ret.logger = log.New(io.Discard, "", 0)
 	udpaddr, err := net.ResolveUDPAddr(l3proto, address)
 	if err != nil {
 		return nil, errors.Wrap(err, "ResolveUDPAddr Error")
@@ -38,7 +40,7 @@ func NewUDPListener(l3proto, address string) (ISnmpServerListener, error) {
 	return ret, nil
 }
 
-func (udp *UDPListener) SetupLogger(i ILogger) {
+func (udp *UDPListener) SetupLogger(i *log.Logger) {
 	udp.logger = i
 }
 func (udp *UDPListener) Address() net.Addr {
@@ -54,7 +56,7 @@ func (udp *UDPListener) NextSnmp() ([]byte, IReplyer, error) {
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "UDP Read Error")
 	}
-	udp.logger.Infof("udp request from %v. size=%v", udpAddr, counts)
+	udp.logger.Printf("udp request from %v. size=%v\n", udpAddr, counts)
 	return msg[:counts], &UDPReplyer{udpAddr, udp.conn}, nil
 }
 

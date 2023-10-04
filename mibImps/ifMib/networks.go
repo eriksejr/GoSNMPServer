@@ -20,7 +20,7 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 	toRet := []*GoSNMPServer.PDUValueControlItem{}
 	valInterfaces, err := net.Interfaces()
 	if err != nil {
-		g_Logger.Errorf("network ifs read failed. err=%v", err)
+		g_Logger.Printf("network ifs read failed. err=%v\n", err)
 		return toRet
 	}
 	netifs := make(map[string]net.InterfaceStat)
@@ -29,7 +29,7 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 	}
 	vcounters, err := net.IOCounters(true)
 	if err != nil {
-		g_Logger.Errorf("network IOCounters read failed. err=%v", err)
+		g_Logger.Printf("network IOCounters read failed. err=%v\n", err)
 		return toRet
 	}
 	for ifIndex, val := range vcounters {
@@ -231,7 +231,7 @@ func appendLinuxPlatformNetworks(io *[]*GoSNMPServer.PDUValueControlItem, ifName
 				if val, ok := str_num[bTString]; ok {
 					return GoSNMPServer.Asn1IntegerWrap(int(val)), nil
 				} else {
-					g_Logger.Errorf("get ifOperStatus: unknown operstate %v", bTString)
+					g_Logger.Printf("get ifOperStatus: unknown operstate %v\n", bTString)
 					return GoSNMPServer.Asn1IntegerWrap(int(0)), nil
 				}
 			},

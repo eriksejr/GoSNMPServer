@@ -1,15 +1,20 @@
 package ifMib
 
-import "github.com/eriksejr/GoSNMPServer"
+import (
+	"log"
+	"os"
+
+	"github.com/eriksejr/GoSNMPServer"
+)
 
 func init() {
-	g_Logger = GoSNMPServer.NewDiscardLogger()
+	g_Logger = log.New(os.Stdout, "ifMib", 0)
 }
 
-var g_Logger GoSNMPServer.ILogger
+var g_Logger *log.Logger
 
 // SetupLogger Setups Logger for this mib
-func SetupLogger(i GoSNMPServer.ILogger) {
+func SetupLogger(i *log.Logger) {
 	g_Logger = i
 }
 
