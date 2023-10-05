@@ -53,6 +53,13 @@ func (t *SubAgent) SyncConfig() error {
 	return nil
 }
 
+func (t *SubAgent) ReplaceOIDList(oids []*PDUValueControlItem) {
+	t.Lock()
+	t.OIDs = oids
+	t.Unlock()
+	t.SyncConfig()
+}
+
 func (t *SubAgent) Serve(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
 	switch i.PDUType {
 	case gosnmp.GetRequest:
