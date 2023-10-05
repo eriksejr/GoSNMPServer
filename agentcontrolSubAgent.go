@@ -5,6 +5,7 @@ import (
 	"log"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/errors"
@@ -25,12 +26,16 @@ type SubAgent struct {
 	Logger *log.Logger
 
 	master *MasterAgent
+
+	sync.RWMutex
 }
 
 func (t *SubAgent) SyncConfig() error {
 	var (
 		err error
 	)
+	t.Lock()
+	defer t.Unlock()
 	for _, oid := range t.OIDs {
 		if err = VerifyOid(oid.OID); err != nil {
 			return err
@@ -269,6 +274,8 @@ func (t *SubAgent) serveTrap(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
 }
 
 func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
+	t.RLock()
+	defer t.RUnlock()
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
 	ret.PDUType = gosnmp.GetResponse
 	ret.Variables = []gosnmp.SnmpPDU{}
@@ -329,6 +336,8 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 }
 
 func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
+	t.RLock()
+	defer t.RUnlock()
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
 
 	ret.PDUType = gosnmp.GetResponse
@@ -450,6 +459,8 @@ func (t *SubAgent) serveSetRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, er
 }
 
 func (t *SubAgent) getForPDUValueControl(oid string) (*PDUValueControlItem, int) {
+	t.RLock()
+	defer t.RUnlock()
 	toQuery := oidToByteString(oid)
 	i := sort.Search(len(t.OIDs), func(i int) bool {
 		thisOid := oidToByteString(t.OIDs[i].OID)
