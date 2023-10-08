@@ -26,6 +26,7 @@ func SetupLogger(i *log.Logger) {
 //	    http://www.net-snmp.org/docs/mibs/dismanEventMIB.html
 func DismanEventOids() []*GoSNMPServer.PDUValueControlItem {
 	return []*GoSNMPServer.PDUValueControlItem{
+		// Uptime
 		{
 			OID:  "1.3.6.1.2.1.1.3.0",
 			Type: gosnmp.TimeTicks,
@@ -36,7 +37,6 @@ func DismanEventOids() []*GoSNMPServer.PDUValueControlItem {
 					return GoSNMPServer.Asn1TimeTicksWrap(uint32(val)), nil
 				}
 			},
-			Document: "Uptime",
 		},
 	}
 }

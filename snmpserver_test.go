@@ -68,8 +68,8 @@ func (suite *ServerTests) TestErrors() {
 						OnGet: func() (value interface{}, err error) {
 							return Asn1IntegerWrap(0), nil
 						},
-						Document: "",
 					},
+					// TestError
 					{
 						OID:  "1.2.4.1",
 						Type: gosnmp.IPAddress,
@@ -79,8 +79,8 @@ func (suite *ServerTests) TestErrors() {
 						OnSet: func(value interface{}) (err error) {
 							return errors.New("TestError")
 						},
-						Document: "TestError",
 					},
+					// TestPanic
 					{
 						OID:  "1.2.4.2",
 						Type: gosnmp.IPAddress,
@@ -90,8 +90,8 @@ func (suite *ServerTests) TestErrors() {
 						OnSet: func(value interface{}) (err error) {
 							panic(errors.New("TestError"))
 						},
-						Document: "TestPanic",
 					},
+					// NonWalkable
 					{
 						OID:         "1.2.4.3",
 						Type:        gosnmp.IPAddress,
@@ -99,9 +99,9 @@ func (suite *ServerTests) TestErrors() {
 						OnGet: func() (value interface{}, err error) {
 							panic(errors.New("TestError"))
 						},
-						OnSet:    nil, // set will failture
-						Document: "NonWalkable",
+						OnSet: nil, // set will failure
 					},
+					// PermissionDenied
 					{
 						OID:         "1.2.4.4",
 						Type:        gosnmp.OctetString,
@@ -117,17 +117,17 @@ func (suite *ServerTests) TestErrors() {
 							getedPriv = true
 							return nil
 						},
-						Document: "PermissionDenied",
 					},
+					// Try some non-walkable items
 					{
 						OID:  "1.2.4.5",
 						Type: gosnmp.OctetString,
 						OnGet: func() (value interface{}, err error) {
 							return "1t&1ZZvY750j", nil
 						},
-						OnSet:    nil, // set will failture
-						Document: "Try some Nonwalkable Items",
+						OnSet: nil, // set will failure
 					},
+					// SetOnly
 					{
 						OID:   "1.2.4.6",
 						Type:  gosnmp.OctetString,
@@ -135,7 +135,6 @@ func (suite *ServerTests) TestErrors() {
 						OnSet: func(value interface{}) (err error) {
 							return nil
 						},
-						Document: "SetOnly",
 					},
 				},
 			},
@@ -433,6 +432,7 @@ func (suite *ServerTests) TestGetSetOids() {
 func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 	baseTestSuite := suite
 	return []*PDUValueControlItem{
+		// TestTypeInteger
 		{
 			OID:  "1.2.3.1",
 			Type: gosnmp.Integer,
@@ -444,8 +444,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_Integer = val
 				return nil
 			},
-			Document: "TestTypeInteger",
 		},
+		// TestTypeNULL
 		{
 			OID:  "1.2.3.2",
 			Type: gosnmp.Null,
@@ -455,8 +455,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 			OnSet: func(value interface{}) (err error) {
 				return nil
 			},
-			Document: "TestTypeNULL",
 		},
+		// TestTypeOctetString
 		{
 			OID:  "1.2.3.3",
 			Type: gosnmp.OctetString,
@@ -468,8 +468,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_OctetString = val
 				return nil
 			},
-			Document: "TestTypeOctetString",
 		},
+		// TestTypeOID
 		{
 			OID:  "1.2.3.4",
 			Type: gosnmp.ObjectIdentifier,
@@ -481,7 +481,7 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				return Asn1ObjectIdentifierWrap(target), nil
 			},
 			OnSet: func(value interface{}) (err error) {
-				suite.Logger.Printf("set ObjectIdentifier. value=", value)
+				suite.Logger.Printf("set ObjectIdentifier. value=%v", value)
 				val := Asn1ObjectIdentifierUnwrap(value)
 				suite.Logger.Printf("after Asn1ObjectIdentifierUnwrap %v->%v\n", value, val)
 				if !IsValidObjectIdentifier(val) {
@@ -490,8 +490,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_ObjectIdentifier = val
 				return nil
 			},
-			Document: "TestTypeObjectIdentifier",
 		},
+		// TestTypeCounter32
 		{
 			OID:  "1.2.3.6",
 			Type: gosnmp.Counter32,
@@ -503,8 +503,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_Counter32 = val
 				return nil
 			},
-			Document: "TestTypeCounter32",
 		},
+		// TestTypeGauge32
 		{
 			OID:  "1.2.3.7",
 			Type: gosnmp.Gauge32,
@@ -516,8 +516,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_Gauge32 = val
 				return nil
 			},
-			Document: "TestTypeGauge32",
 		},
+		// TestTypeTimeTicks
 		{
 			OID:  "1.2.3.8",
 			Type: gosnmp.TimeTicks,
@@ -529,8 +529,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_TimeTicks = val
 				return nil
 			},
-			Document: "TestTypeTimeTicks",
 		},
+		// TestTypeCounter64
 		{
 			OID:  "1.2.3.9",
 			Type: gosnmp.Counter64,
@@ -542,9 +542,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_Counter64 = val
 				return nil
 			},
-			Document: "TestTypeCounter64",
 		},
-
+		// TestTypeUinteger32
 		{
 			OID:  "1.2.3.10",
 			Type: gosnmp.Uinteger32,
@@ -556,8 +555,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_Uinteger32 = val
 				return nil
 			},
-			Document: "TestTypeUinteger32",
 		},
+		// TestTypeOpaqueFloat
 		{
 			OID:  "1.2.3.11",
 			Type: gosnmp.OpaqueFloat,
@@ -569,8 +568,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_OpaqueFloat = val
 				return nil
 			},
-			Document: "TestTypeOpaqueFloat",
 		},
+		// TestTypeOpaqueDouble
 		{
 			OID:  "1.2.3.12",
 			Type: gosnmp.OpaqueDouble,
@@ -582,8 +581,8 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_OpaqueDouble = val
 				return nil
 			},
-			Document: "TestTypeOpaqueDouble",
 		},
+		// TestTypeIPAddress
 		{
 			OID:  "1.2.3.13",
 			Type: gosnmp.IPAddress,
@@ -599,7 +598,6 @@ func (suite *ServerTests) getTestGetSetOIDS() []*PDUValueControlItem {
 				baseTestSuite.privGetSetOIDS.val_IPAddress = val
 				return nil
 			},
-			Document: "TestTypeIPAddress",
 		},
 	}
 }

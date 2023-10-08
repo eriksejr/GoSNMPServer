@@ -46,7 +46,7 @@ func (suite *TrapTests) TestTraps() {
 			{
 				CommunityIDs: []string{"public"},
 				OIDs: []*PDUValueControlItem{
-
+					// Trap
 					{
 						OID:  "1.2.4.1",
 						Type: gosnmp.OctetString,
@@ -62,7 +62,6 @@ func (suite *TrapTests) TestTraps() {
 							waiterReadyToWork <- 1
 							return
 						},
-						Document: "Trap",
 					},
 				},
 			},
@@ -89,7 +88,7 @@ func (suite *TrapTests) TestTraps() {
 			suite.T().Errorf("cmd meet error: %+v.\nresultErr=%v\n resultout=%v",
 				err, string(err.(*exec.ExitError).Stderr), string(result))
 		}
-		_ = <-waiterReadyToWork
+		<-waiterReadyToWork
 		data := Asn1OctetStringUnwrap(trapDataReceived.Value)
 		assert.Equal(suite.T(), "1.2.3.13", data)
 	})
@@ -100,7 +99,7 @@ func (suite *TrapTests) TestTraps() {
 			suite.T().Errorf("cmd meet error: %+v.\nresultErr=%v\n resultout=%v",
 				err, string(err.(*exec.ExitError).Stderr), string(result))
 		}
-		_ = <-waiterReadyToWork
+		<-waiterReadyToWork
 		data := Asn1OctetStringUnwrap(trapDataReceived.Value)
 		assert.Equal(suite.T(), "v1Test", data)
 	})
@@ -111,7 +110,7 @@ func (suite *TrapTests) TestTraps() {
 			suite.T().Errorf("cmd meet error: %+v.\nresultErr=%v\n resultout=%v",
 				err, string(err.(*exec.ExitError).Stderr), string(result))
 		}
-		_ = <-waiterReadyToWork
+		<-waiterReadyToWork
 		data := Asn1OctetStringUnwrap(trapDataReceived.Value)
 		assert.Equal(suite.T(), "inform", data)
 		assert.Equal(suite.T(), "", string(result))
@@ -127,7 +126,7 @@ func (suite *TrapTests) TestTraps() {
 			suite.T().Errorf("cmd meet error: %+v.\nresultErr=%v\n resultout=%v",
 				err, string(err.(*exec.ExitError).Stderr), string(result))
 		}
-		_ = <-waiterReadyToWork
+		<-waiterReadyToWork
 		data := Asn1OctetStringUnwrap(trapDataReceived.Value)
 		assert.Equal(suite.T(), "1.2.3.13", data)
 	})
@@ -171,7 +170,7 @@ func (suite *TrapTests) TestTraps() {
 		if _, err := client.SendTrap(trap); err != nil {
 			panic(err)
 		}
-		_ = <-waiterReadyToWork
+		<-waiterReadyToWork
 		data := Asn1OctetStringUnwrap(trapDataReceived.Value)
 		assert.Equal(suite.T(), ".1.3.6.1.6.3.1.1.5.1", data)
 	})
@@ -190,7 +189,7 @@ func (suite *TrapTests) TestErrorTraps() {
 			{
 				CommunityIDs: []string{"public"},
 				OIDs: []*PDUValueControlItem{
-
+					// Trap
 					{
 						OID:  "1.2.4.1",
 						Type: gosnmp.OctetString,
@@ -199,8 +198,8 @@ func (suite *TrapTests) TestErrorTraps() {
 							waiterReadyToWork <- 1
 							return
 						},
-						Document: "Trap",
 					},
+					// Trap
 					{
 						OID:  "1.2.4.2",
 						Type: gosnmp.OctetString,
@@ -211,8 +210,8 @@ func (suite *TrapTests) TestErrorTraps() {
 						OnTrap: func(isInform bool, trapdata gosnmp.SnmpPDU) (dataret interface{}, err error) {
 							return
 						},
-						Document: "Trap",
 					},
+					// Trap
 					{
 						OID:  "1.2.4.3",
 						Type: gosnmp.OctetString,
@@ -220,7 +219,6 @@ func (suite *TrapTests) TestErrorTraps() {
 							waiterReadyToWork <- 3
 							panic("panic")
 						},
-						Document: "Trap",
 					},
 				},
 			},

@@ -3,8 +3,8 @@ package GoSNMPServer
 import (
 	"net"
 
-	"github.com/pkg/errors"
 	"github.com/gosnmp/gosnmp"
+	"github.com/pkg/errors"
 )
 
 // PermissionAllowance  ENUM controls for Allowance
@@ -64,10 +64,6 @@ type PDUValueControlItem struct {
 	OnSet FuncPDUControlSet
 	// OnTrap will be called on TRAP.
 	OnTrap FuncPDUControlTrap
-	//////////// For human document
-
-	//Document for this PDU Item. ignored by the program.
-	Document string
 }
 
 func Asn1IntegerUnwrap(i interface{}) int { return i.(int) }

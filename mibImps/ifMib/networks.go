@@ -37,18 +37,19 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 		ifName := val.Name
 		ifHWAddr := targetIf.HardwareAddr
 		currentIf := []*GoSNMPServer.PDUValueControlItem{
+			// ifIndex
 			{
-				OID:      fmt.Sprintf("1.3.6.1.2.1.2.2.1.1.%d", ifIndex),
-				Type:     gosnmp.Integer,
-				OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(ifIndex), nil },
-				Document: "ifIndex",
+				OID:   fmt.Sprintf("1.3.6.1.2.1.2.2.1.1.%d", ifIndex),
+				Type:  gosnmp.Integer,
+				OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(ifIndex), nil },
 			},
+			// ifDescr
 			{
-				OID:      fmt.Sprintf("1.3.6.1.2.1.2.2.1.2.%d", ifIndex),
-				Type:     gosnmp.OctetString,
-				OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap(ifName), nil },
-				Document: "ifDescr",
+				OID:   fmt.Sprintf("1.3.6.1.2.1.2.2.1.2.%d", ifIndex),
+				Type:  gosnmp.OctetString,
+				OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap(ifName), nil },
 			},
+			// ifType
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.3.%d", ifIndex),
 				Type: gosnmp.Integer,
@@ -57,8 +58,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					//XXX: Let's assume all item is gigabitEthernet. /sys/class/net/eth0/type
 					return GoSNMPServer.Asn1IntegerWrap(gigabitEthernet), nil
 				},
-				Document: "ifType",
 			},
+			// ifPhysAddress
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.6.%d", ifIndex),
 				Type: gosnmp.OctetString,
@@ -70,8 +71,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1OctetStringWrap(string(decoded)), nil
 				},
-				Document: "ifPhysAddress",
 			},
+			// ifInOctets
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.10.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -82,8 +83,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.BytesRecv)), nil
 				},
-				Document: "ifInOctets",
 			},
+			// ifInUcastPkts
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.11.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -94,8 +95,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.PacketsRecv)), nil
 				},
-				Document: "ifInUcastPkts",
 			},
+			// ifInDiscards
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.13.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -106,8 +107,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.Dropin)), nil
 				},
-				Document: "ifInDiscards",
 			},
+			// ifInerrors
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.14.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -118,8 +119,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.Errin)), nil
 				},
-				Document: "ifInErrors",
 			},
+			// ifOutOctets
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.16.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -130,8 +131,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.BytesSent)), nil
 				},
-				Document: "ifOutOctets",
 			},
+			// ifOutUcastPkts
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.17.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -142,8 +143,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.PacketsSent)), nil
 				},
-				Document: "ifOutUcastPkts",
 			},
+			// ifOutDiscards
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.19.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -154,8 +155,8 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.Dropout)), nil
 				},
-				Document: "ifOutDisCards",
 			},
+			// ifOutErrors
 			{
 				OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.20.%d", ifIndex),
 				Type: gosnmp.Counter32,
@@ -166,7 +167,6 @@ func NetworkOIDs() []*GoSNMPServer.PDUValueControlItem {
 					}
 					return GoSNMPServer.Asn1Counter32Wrap(uint(vid.Errout)), nil
 				},
-				Document: "ifOutErrors",
 			},
 		}
 		appendLinuxPlatformNetworks(&currentIf, ifName, ifIndex)
@@ -196,6 +196,7 @@ func appendLinuxPlatformNetworks(io *[]*GoSNMPServer.PDUValueControlItem, ifName
 		return
 	}
 	toAppend := []*GoSNMPServer.PDUValueControlItem{
+		// ifAdminStatus
 		{
 			OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.7.%d", ifIndex),
 			Type: gosnmp.Integer,
@@ -208,8 +209,8 @@ func appendLinuxPlatformNetworks(io *[]*GoSNMPServer.PDUValueControlItem, ifName
 				}
 				return GoSNMPServer.Asn1IntegerWrap(adminstatus_up), nil
 			},
-			Document: "ifAdminStatus",
 		},
+		// ifOperStatus
 		{
 			OID:  fmt.Sprintf("1.3.6.1.2.1.2.2.1.8.%d", ifIndex),
 			Type: gosnmp.Integer,
@@ -235,7 +236,6 @@ func appendLinuxPlatformNetworks(io *[]*GoSNMPServer.PDUValueControlItem, ifName
 					return GoSNMPServer.Asn1IntegerWrap(int(0)), nil
 				}
 			},
-			Document: "ifOperStatus",
 		},
 	}
 	*io = append(*io, toAppend...)

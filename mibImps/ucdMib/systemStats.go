@@ -13,18 +13,19 @@ import (
 //	see http://www.net-snmp.org/docs/mibs/ucdavis.html#DisplayString
 func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 	toRet := []*GoSNMPServer.PDUValueControlItem{
+		// ssIndex
 		{
-			OID:      "1.3.6.1.4.1.2021.11.1",
-			Type:     gosnmp.Integer,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(0), nil },
-			Document: "ssIndex",
+			OID:   "1.3.6.1.4.1.2021.11.1",
+			Type:  gosnmp.Integer,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(0), nil },
 		},
+		// ssErrorName
 		{
-			OID:      "1.3.6.1.4.1.2021.11.2",
-			Type:     gosnmp.OctetString,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap("systemStats"), nil },
-			Document: "ssErrorName",
+			OID:   "1.3.6.1.4.1.2021.11.2",
+			Type:  gosnmp.OctetString,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap("systemStats"), nil },
 		},
+		// ssCpuRawUser
 		{
 			OID:  "1.3.6.1.4.1.2021.11.50",
 			Type: gosnmp.Counter32,
@@ -35,8 +36,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawUser",
 		},
+		// ssCpuRawNice
 		{
 			OID:  "1.3.6.1.4.1.2021.11.51",
 			Type: gosnmp.Counter32,
@@ -47,8 +48,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawNice",
 		},
+		// ssCpuRawSystem
 		{
 			OID:  "1.3.6.1.4.1.2021.11.52",
 			Type: gosnmp.Counter32,
@@ -59,8 +60,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawSystem",
 		},
+		// ssCpuRawIdle
 		{
 			OID:  "1.3.6.1.4.1.2021.11.53",
 			Type: gosnmp.Counter32,
@@ -71,8 +72,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawIdle",
 		},
+		// ssCpuRawWait
 		{
 			OID:  "1.3.6.1.4.1.2021.11.54",
 			Type: gosnmp.Counter32,
@@ -83,8 +84,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawWait",
 		},
+		// ssCpuRawInterrupt
 		{
 			OID:  "1.3.6.1.4.1.2021.11.56",
 			Type: gosnmp.Counter32,
@@ -95,8 +96,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawInterrupt",
 		},
+		// ssIORawSent
 		{
 			OID:  "1.3.6.1.4.1.2021.11.57",
 			Type: gosnmp.Counter32,
@@ -111,8 +112,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssIORawSent",
 		},
+		// ssIORawReceived
 		{
 			OID:  "1.3.6.1.4.1.2021.11.58",
 			Type: gosnmp.Counter32,
@@ -127,8 +128,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssIORawReceived",
 		},
+		// ssCpiRawSoftIRQ
 		{
 			OID:  "1.3.6.1.4.1.2021.11.61",
 			Type: gosnmp.Counter32,
@@ -139,8 +140,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawSoftIRQ",
 		},
+		// ssCpuRawSteal
 		{
 			OID:  "1.3.6.1.4.1.2021.11.64",
 			Type: gosnmp.Counter32,
@@ -151,8 +152,8 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawSteal",
 		},
+		// ssCpuRawGuest
 		{
 			OID:  "1.3.6.1.4.1.2021.11.65",
 			Type: gosnmp.Counter32,
@@ -163,7 +164,6 @@ func SystemStatsOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "ssCpuRawGuest",
 		},
 	}
 
@@ -176,6 +176,7 @@ func appendLinuxPlatformSystemStats(io *[]*GoSNMPServer.PDUValueControlItem) {
 		return
 	}
 	toAppend := []*GoSNMPServer.PDUValueControlItem{
+		// ssRawInterrupts
 		{
 			OID:  "1.3.6.1.4.1.2021.11.59",
 			Type: gosnmp.Counter32,
@@ -186,8 +187,8 @@ func appendLinuxPlatformSystemStats(io *[]*GoSNMPServer.PDUValueControlItem) {
 					return nil, err
 				}
 			},
-			Document: "ssRawInterrupts",
 		},
+		// ssRawContexts
 		{
 			OID:  "1.3.6.1.4.1.2021.11.60",
 			Type: gosnmp.Counter32,
@@ -198,7 +199,6 @@ func appendLinuxPlatformSystemStats(io *[]*GoSNMPServer.PDUValueControlItem) {
 					return nil, err
 				}
 			},
-			Document: "ssRawContexts",
 		},
 	}
 	*io = append(*io, toAppend...)

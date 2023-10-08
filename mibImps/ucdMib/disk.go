@@ -43,28 +43,29 @@ func DiskUsageOIDs(showTheseNameOnly ...NameOverride) []*GoSNMPServer.PDUValueCo
 		cid := id + 1
 		currentDiskItem := each
 		thisDiskID := []*GoSNMPServer.PDUValueControlItem{
+			// diskIndex
 			{
-				OID:      fmt.Sprintf("1.3.6.1.4.1.2021.9.1.1.%d", cid),
-				Type:     gosnmp.Integer,
-				OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(cid), nil },
-				Document: "dskIndex",
+				OID:   fmt.Sprintf("1.3.6.1.4.1.2021.9.1.1.%d", cid),
+				Type:  gosnmp.Integer,
+				OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(cid), nil },
 			},
+			// currentDiskPath
 			{
 				OID:  fmt.Sprintf("1.3.6.1.4.1.2021.9.1.2.%d", cid),
 				Type: gosnmp.OctetString,
 				OnGet: func() (value interface{}, err error) {
 					return GoSNMPServer.Asn1OctetStringWrap(currentDiskItem.ShowName), nil
 				},
-				Document: "currentDskPath",
 			},
+			// currentDiskDevice
 			{
 				OID:  fmt.Sprintf("1.3.6.1.4.1.2021.9.1.3.%d", cid),
 				Type: gosnmp.OctetString,
 				OnGet: func() (value interface{}, err error) {
 					return GoSNMPServer.Asn1OctetStringWrap(currentDiskItem.ShowName), nil
 				},
-				Document: "currentDskDevice",
 			},
+			// currentDistTotal
 			{
 				OID:  fmt.Sprintf("1.3.6.1.4.1.2021.9.1.6.%d", cid),
 				Type: gosnmp.Integer,
@@ -75,8 +76,8 @@ func DiskUsageOIDs(showTheseNameOnly ...NameOverride) []*GoSNMPServer.PDUValueCo
 					}
 					return GoSNMPServer.Asn1IntegerWrap(int(data.Total / 1024 / 1024)), nil
 				},
-				Document: "currentDskTotal",
 			},
+			// currentDskAvail
 			{
 				OID:  fmt.Sprintf("1.3.6.1.4.1.2021.9.1.7.%d", cid),
 				Type: gosnmp.Integer,
@@ -87,8 +88,8 @@ func DiskUsageOIDs(showTheseNameOnly ...NameOverride) []*GoSNMPServer.PDUValueCo
 					}
 					return GoSNMPServer.Asn1IntegerWrap(int(data.Free / 1024 / 1024)), nil
 				},
-				Document: "currentDskAvail",
 			},
+			// currentDskUsed
 			{
 				OID:  fmt.Sprintf("1.3.6.1.4.1.2021.9.1.8.%d", cid),
 				Type: gosnmp.Integer,
@@ -99,8 +100,8 @@ func DiskUsageOIDs(showTheseNameOnly ...NameOverride) []*GoSNMPServer.PDUValueCo
 					}
 					return GoSNMPServer.Asn1IntegerWrap(int(data.Used / 1024 / 1024)), nil
 				},
-				Document: "currentDskUsed",
 			},
+			// currentDskPercent
 			{
 				OID:  fmt.Sprintf("1.3.6.1.4.1.2021.9.1.9.%d", cid),
 				Type: gosnmp.Integer,
@@ -111,7 +112,6 @@ func DiskUsageOIDs(showTheseNameOnly ...NameOverride) []*GoSNMPServer.PDUValueCo
 					}
 					return GoSNMPServer.Asn1IntegerWrap(int(data.UsedPercent)), nil
 				},
-				Document: "currentDskPercent",
 			},
 		}
 		toRet = append(toRet, thisDiskID...)

@@ -11,18 +11,19 @@ import (
 //	see http://www.net-snmp.org/docs/mibs/ucdavis.html#DisplayString
 func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 	toRet := []*GoSNMPServer.PDUValueControlItem{
+		// memIndex
 		{
-			OID:      "1.3.6.1.4.1.2021.4.1",
-			Type:     gosnmp.Integer,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(1), nil },
-			Document: "memIndex",
+			OID:   "1.3.6.1.4.1.2021.4.1",
+			Type:  gosnmp.Integer,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(1), nil },
 		},
+		// memErrorName
 		{
-			OID:      "1.3.6.1.4.1.2021.4.2",
-			Type:     gosnmp.OctetString,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap("swap"), nil },
-			Document: "memErrorName",
+			OID:   "1.3.6.1.4.1.2021.4.2",
+			Type:  gosnmp.OctetString,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap("swap"), nil },
 		},
+		// memTotalSwap
 		{
 			OID:  "1.3.6.1.4.1.2021.4.3",
 			Type: gosnmp.Integer,
@@ -33,8 +34,8 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memTotalSwap",
 		},
+		// memAvailSwap
 		{
 			OID:  "1.3.6.1.4.1.2021.4.4",
 			Type: gosnmp.Integer,
@@ -45,8 +46,8 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memAvailSwap",
 		},
+		// memTotalReal
 		{
 			OID:  "1.3.6.1.4.1.2021.4.5",
 			Type: gosnmp.Integer,
@@ -57,8 +58,8 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memTotalReal",
 		},
+		// memAvailReal
 		{
 			OID:  "1.3.6.1.4.1.2021.4.6",
 			Type: gosnmp.Integer,
@@ -69,8 +70,8 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memAvailReal",
 		},
+		// memTotalFree
 		{
 			OID:  "1.3.6.1.4.1.2021.4.11",
 			Type: gosnmp.Integer,
@@ -85,14 +86,14 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memTotalFree",
 		},
+		// memMinimumSwap
 		{
-			OID:      "1.3.6.1.4.1.2021.4.12",
-			Type:     gosnmp.Integer,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(0), nil },
-			Document: "memMinimumSwap",
+			OID:   "1.3.6.1.4.1.2021.4.12",
+			Type:  gosnmp.Integer,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(0), nil },
 		},
+		// memBuffer
 		{
 			OID:  "1.3.6.1.4.1.2021.4.14",
 			Type: gosnmp.Integer,
@@ -103,8 +104,8 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memBuffer",
 		},
+		// memCached
 		{
 			OID:  "1.3.6.1.4.1.2021.4.15",
 			Type: gosnmp.Integer,
@@ -115,19 +116,18 @@ func MemoryOIDs() []*GoSNMPServer.PDUValueControlItem {
 					return nil, err
 				}
 			},
-			Document: "memCached",
 		},
+		// memSwapError
 		{
-			OID:      "1.3.6.1.4.1.2021.4.100",
-			Type:     gosnmp.Integer,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(0), nil },
-			Document: "memSwapError",
+			OID:   "1.3.6.1.4.1.2021.4.100",
+			Type:  gosnmp.Integer,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1IntegerWrap(0), nil },
 		},
+		// memSwapErrorMsg
 		{
-			OID:      "1.3.6.1.4.1.2021.4.101",
-			Type:     gosnmp.OctetString,
-			OnGet:    func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap(""), nil },
-			Document: "memSwapErrorMsg",
+			OID:   "1.3.6.1.4.1.2021.4.101",
+			Type:  gosnmp.OctetString,
+			OnGet: func() (value interface{}, err error) { return GoSNMPServer.Asn1OctetStringWrap(""), nil },
 		},
 	}
 	return toRet

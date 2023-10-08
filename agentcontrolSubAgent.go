@@ -53,9 +53,9 @@ func (t *SubAgent) SyncConfig() error {
 	return nil
 }
 
-func (t *SubAgent) ReplaceOIDList(oids []*PDUValueControlItem) {
+func (t *SubAgent) ReplaceOIDs(newOids []*PDUValueControlItem) {
 	t.Lock()
-	t.OIDs = oids
+	t.OIDs = newOids
 	t.Unlock()
 	t.SyncConfig()
 }
