@@ -96,7 +96,7 @@ func (t *SNMPEngineID) Marshal() []byte {
 	// case we will use Octets, administratively assigned (5) per
 	// RFC 3411
 	engineIdPrefix = append(engineIdPrefix, 0x05)
-	tm := make([]byte, 5)
+	tm := make([]byte, hex.EncodedLen(len(engineIdPrefix)))
 	hex.Encode(tm, engineIdPrefix)
 	// Append the remaining engine ID data
 	toAppend := []byte(t.EngineIDData)
