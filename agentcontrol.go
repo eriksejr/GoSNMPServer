@@ -1,15 +1,16 @@
 package GoSNMPServer
 
 import (
+	"crypto/rand"
+	"encoding/binary"
+	"encoding/hex"
 	"io"
 	"log"
 	"reflect"
-	"strings"
 	"time"
 
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/host"
 )
 
 type EnabledVersion uint8
@@ -22,7 +23,7 @@ const (
 
 type FuncGetAuthoritativeEngineTime func() uint32
 
-// MasterAgent identifys software which runs on managed devices
+// MasterAgent identifies software which runs on managed devices
 //
 //	One server (port) could ONLY have one MasterAgent
 type MasterAgent struct {
@@ -33,6 +34,8 @@ type MasterAgent struct {
 	Logger *log.Logger
 
 	AllowedVersion EnabledVersion
+
+	CreateTime time.Time
 
 	priv struct {
 		communityToSubAgent map[string]*SubAgent
@@ -70,20 +73,30 @@ type SNMPEngineID struct {
 	// See https://tools.ietf.org/html/rfc3411#section-5
 	// 			SnmpEngineID ::= TEXTUAL-CONVENTION
 	//      SYNTAX       OCTET STRING (SIZE(5..32))
+	PEN uint32
+
 	EngineIDData string
 }
 
 func (t *SNMPEngineID) Marshal() []byte {
-
 	// msgAuthoritativeEngineID: 80004fb8054445534b544f502d4a3732533245343ab63bc8
 	// 1... .... = Engine ID Conformance: RFC3411 (SNMPv3)
-	// Engine Enterprise ID: pysnmp (20408)
+	// Engine Enterprise ID: pysnmp (20408) - used if no PEN specified
 	// Engine ID Format: Octets, administratively assigned (5)
 	// Engine ID Data: 4445534b544f502d4a3732533245343ab63bc8
 
-	var tm = []byte{
-		0x80, 0x00, 0x4f, 0xb8, 0x05,
-	}
+	tm := make([]byte, 4)
+	// Use the PEN for the first 4 octets as per RFC3411
+	pen := t.PEN
+	// Set the first bit to 1 to indicate RFC3411 method
+	pen |= 1 << 31
+	// Convert this uint32 to []byte via the binary package
+	binary.LittleEndian.PutUint32(tm, pen)
+	// Append the engine ID format info to the slice, in this
+	// case we will use Octets, administratively assigned (5) per
+	// RFC 3411
+	tm = append(tm, 0x05)
+	// Append the remaining engine ID data
 	toAppend := []byte(t.EngineIDData)
 	maxDefineallowed := 32 - 5
 	if len(toAppend) > maxDefineallowed { //Max 32 bytes
@@ -105,10 +118,14 @@ func (t *MasterAgent) syncAndCheck() error {
 		//Set New NIL Logger
 		t.Logger = log.New(io.Discard, "", 0)
 	}
-	if t.SecurityConfig.OnGetAuthoritativeEngineTime == nil {
-		t.SecurityConfig.OnGetAuthoritativeEngineTime = DefaultGetAuthoritativeEngineTime
+	if t.CreateTime.IsZero() {
+		t.CreateTime = time.Now()
 	}
-
+	if t.SecurityConfig.OnGetAuthoritativeEngineTime == nil {
+		t.SecurityConfig.OnGetAuthoritativeEngineTime = func() uint32 {
+			return uint32(time.Since(t.CreateTime).Seconds())
+		}
+	}
 	if t.SecurityConfig.AuthoritativeEngineID.EngineIDData == "" {
 		t.SecurityConfig.AuthoritativeEngineID = DefaultAuthoritativeEngineID()
 	}
@@ -305,19 +322,21 @@ func (t *MasterAgent) findForSubAgent(community string) *SubAgent {
 	}
 }
 
-func DefaultAuthoritativeEngineID() SNMPEngineID {
-	// XXX:TODO: return random
-	val, _ := host.Info()
-	data := strings.Replace(val.HostID, "-", "", -1)
-	return SNMPEngineID{
-		EngineIDData: data,
+// NOTE: Using random data here really is *NOT* the proper way to do this
+// as per RFC3411 the same SNMP Engine should always return the same SNMP
+// engine ID
+func RandomEngineIdData(length int) string {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		// This really shouldn't error
+		panic(err)
 	}
+	return hex.EncodeToString(bytes)
 }
 
-func DefaultGetAuthoritativeEngineTime() uint32 {
-	val, err := host.Uptime()
-	if err != nil {
-		return uint32(time.Now().Unix())
+func DefaultAuthoritativeEngineID() SNMPEngineID {
+	return SNMPEngineID{
+		PEN:          20408,
+		EngineIDData: RandomEngineIdData(16),
 	}
-	return uint32(val)
 }
