@@ -96,7 +96,7 @@ func (server *SNMPServer) ServeNextRequest() (err error) {
 	}
 	if len(result) != 0 {
 		if errreply := replyer.ReplyPDU(result); errreply != nil {
-			server.logger.Println("Reply PDU meet err:", errreply)
+			server.logger.Printf("Reply PDU meet err: %s\n", errreply)
 			replyer.Shutdown()
 			return nil
 		}

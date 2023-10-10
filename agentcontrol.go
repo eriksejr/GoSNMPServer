@@ -85,17 +85,19 @@ func (t *SNMPEngineID) Marshal() []byte {
 	// Engine ID Format: Octets, administratively assigned (5)
 	// Engine ID Data: 4445534b544f502d4a3732533245343ab63bc8
 
-	tm := make([]byte, 4)
+	engineIdPrefix := make([]byte, 4)
 	// Use the PEN for the first 4 octets as per RFC3411
 	pen := t.PEN
 	// Set the first bit to 1 to indicate RFC3411 method
 	pen |= 1 << 31
 	// Convert this uint32 to []byte via the binary package
-	binary.LittleEndian.PutUint32(tm, pen)
+	binary.LittleEndian.PutUint32(engineIdPrefix, pen)
 	// Append the engine ID format info to the slice, in this
 	// case we will use Octets, administratively assigned (5) per
 	// RFC 3411
-	tm = append(tm, 0x05)
+	engineIdPrefix = append(engineIdPrefix, 0x05)
+	tm := make([]byte, 5)
+	hex.Encode(tm, engineIdPrefix)
 	// Append the remaining engine ID data
 	toAppend := []byte(t.EngineIDData)
 	maxDefineallowed := 32 - 5
