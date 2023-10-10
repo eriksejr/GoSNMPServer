@@ -91,7 +91,7 @@ func (t *SNMPEngineID) Marshal() []byte {
 	// Set the first bit to 1 to indicate RFC3411 method
 	pen |= 1 << 31
 	// Convert this uint32 to []byte via the binary package
-	binary.LittleEndian.PutUint32(engineIdPrefix, pen)
+	binary.BigEndian.PutUint32(engineIdPrefix, pen)
 	// Append the engine ID format info to the slice, in this
 	// case we will use Octets, administratively assigned (5) per
 	// RFC 3411
