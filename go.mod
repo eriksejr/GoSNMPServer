@@ -7,7 +7,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/procfs v0.12.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
-	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
 )
