@@ -92,7 +92,7 @@ func (t *SubAgent) getPDU(Name string, Type gosnmp.Asn1BER, Value interface{}) g
 	}
 }
 func (t *SubAgent) getPDUHelloVariable() gosnmp.SnmpPDU {
-	// Return a variable. Usually for failture login try count.
+	// Return a variable. Usually for failure login try count.
 	//   1.3.6.1.6.3.15.1.1.4.0 => http://oidref.com/1.3.6.1.6.3.15.1.1.4.0
 	//   usmStatsUnknownEngineIDs
 	return t.getPDU(

@@ -43,7 +43,9 @@ func (server *SNMPServer) Address() net.Addr {
 }
 
 func (server *SNMPServer) Shutdown() {
-	server.logger.Println("Shutdown server")
+	if server.logger != nil {
+		server.logger.Println("Shutdown server")
+	}
 	if server.wconnStream != nil {
 		server.wconnStream.Shutdown()
 	}
