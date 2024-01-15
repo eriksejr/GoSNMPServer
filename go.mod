@@ -1,6 +1,6 @@
-module "github.com/eriksejr/GoSNMPServer"
+module github.com/eriksejr/GoSNMPServer
 
-go 1.20
+go 1.21
 
 require (
 	github.com/gosnmp/gosnmp v1.36.2-0.20230920160036-9457f610e8cf

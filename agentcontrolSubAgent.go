@@ -20,7 +20,7 @@ type SubAgent struct {
 	// OIDs for Read/Write actions
 	OIDs []*PDUValueControlItem
 
-	// UserErrorMarkPacket decides if shll treat user returned error as generr
+	// UserErrorMarkPacket decides if shall treat user returned error as generr
 	UserErrorMarkPacket bool
 
 	Logger *log.Logger
@@ -281,8 +281,6 @@ func (t *SubAgent) serveTrap(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
 }
 
 func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
-	t.RLock()
-	defer t.RUnlock()
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
 	ret.PDUType = gosnmp.GetResponse
 	ret.Variables = []gosnmp.SnmpPDU{}
@@ -296,11 +294,17 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 		queryForOidStriped := strings.TrimLeft(queryForOid, ".0")
 		item, id := t.getForPDUValueControl(queryForOidStriped)
 		t.Logger.Printf("(non-repeater) t.getForPDUValueControl. query_for_oid=%v item=%v id=%v\n", queryForOid, item, id)
+		t.RLock()
 		if id >= len(t.OIDs) {
 			ret.Variables = append(ret.Variables, t.getPDUEndOfMibView(queryForOid))
+			t.RUnlock()
 			continue
+		} else {
+			t.RUnlock()
 		}
+		t.RLock()
 		item = t.OIDs[id]
+		t.RUnlock()
 
 		ctl, snmperr := t.getForPDUValueControlResult(item, i)
 		if snmperr != gosnmp.NoError && ret.Error == gosnmp.NoError {
@@ -321,14 +325,20 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 				id += 1
 			}
 			nextIndex := id + int(j)
+			t.RLock()
 			if nextIndex >= len(t.OIDs) {
 				if _, found := eomv[queryForOid]; !found {
 					ret.Variables = append(ret.Variables, t.getPDUEndOfMibView(queryForOid))
 					eomv[queryForOid] = struct{}{}
 				}
+				t.RUnlock()
 				continue
+			} else {
+				t.RUnlock()
 			}
+			t.RLock()
 			item = t.OIDs[nextIndex] // repetition next
+			t.RUnlock()
 			t.Logger.Printf("t.getForPDUValueControl. query_for_oid=%v item=%v id=%v\n", queryForOid, item, id)
 			ctl, snmperr := t.getForPDUValueControlResult(item, i)
 			if snmperr != gosnmp.NoError && ret.Error == gosnmp.NoError {
@@ -343,8 +353,6 @@ func (t *SubAgent) serveGetBulkRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 }
 
 func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
-	t.RLock()
-	defer t.RUnlock()
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
 
 	ret.PDUType = gosnmp.GetResponse
@@ -358,28 +366,39 @@ func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 	if item != nil {
 		id += 1
 	}
+	t.RLock()
 	if id >= len(t.OIDs) {
 		// NOT find for the last
 		ret.Variables = append(ret.Variables, t.getPDUEndOfMibView(queryForOid))
+		t.RUnlock()
 		return &ret, nil
+	} else {
+		t.RUnlock()
 	}
 	if i.MaxRepetitions != 0 {
 		length = int(i.MaxRepetitions)
 	}
+	t.RLock()
 	if length+id > len(t.OIDs) {
 		length = len(t.OIDs) - id
 	}
 	t.Logger.Printf("i.Variables[id: length]. id=%v length =%v. len(t.OIDs)=%v\n", id, length, len(t.OIDs))
+	t.RUnlock()
 	iid := id
 	for {
+		t.RLock()
 		if iid >= len(t.OIDs) {
+			t.RUnlock()
 			break
+		} else {
+			t.RUnlock()
 		}
+		t.RLock()
 		item := t.OIDs[iid]
+		t.RUnlock()
 		if len(ret.Variables) >= length {
 			break
 		}
-
 		if item.NonWalkable || item.OnGet == nil {
 			t.Logger.Printf("getnext: oid=%v. skip for non walkable\n", item.OID)
 			iid += 1
@@ -403,9 +422,9 @@ func (t *SubAgent) serveGetNextRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket
 	return &ret, nil
 }
 
-// serveSetRequest for SetReqeust.
+// serveSetRequest for SetRequest.
 //
-//	will just Return  GetResponse for Fullily SUCCESS
+//	will just Return GetResponse for SUCCESS
 func (t *SubAgent) serveSetRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, error) {
 	var ret gosnmp.SnmpPacket = copySnmpPacket(i)
 	ret.PDUType = gosnmp.GetResponse
@@ -465,6 +484,7 @@ func (t *SubAgent) serveSetRequest(i *gosnmp.SnmpPacket) (*gosnmp.SnmpPacket, er
 	return &ret, nil
 }
 
+// The subagent mutex lock should be held when this is called
 func (t *SubAgent) getForPDUValueControl(oid string) (*PDUValueControlItem, int) {
 	t.RLock()
 	defer t.RUnlock()
