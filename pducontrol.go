@@ -66,6 +66,9 @@ type PDUValueControlItem struct {
 	OnTrap FuncPDUControlTrap
 }
 
+func Asn1BooleanUnwrap(b interface{}) bool { return b.(bool) }
+func Asn1BooleanWrap(b bool) interface{}   { return b }
+
 func Asn1IntegerUnwrap(i interface{}) int { return i.(int) }
 func Asn1IntegerWrap(i int) interface{}   { return i }
 
